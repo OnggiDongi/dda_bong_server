@@ -4,13 +4,13 @@ import lombok.Getter;
 
 @Getter
 public enum Category {
-	LIVING("생활 · 주거 "),
-	EDUCATION("교육 · 상담 · 멘토링"),
-	SAFETY("보건 · 안전 · 재난"),
-	CULTURE("문화 · 예술"),
+	LIVING("생활"),
+	EDUCATION("교육"),
+	SAFETY("보건"),
+	CULTURE("문화"),
 	ENVIRONMENT("환경"),
-	PUBLIC("행정 · 공익"),
-	GLOBAL("농어촌 · 국제협력");
+	PUBLIC("행정"),
+	GLOBAL("농어촌");
 
 	private String description;
 
