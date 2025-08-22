@@ -90,4 +90,11 @@ public class User extends BaseEntity{
 	@Builder.Default
 	@ToString.Exclude
 	private List<Applicant> applicants = new ArrayList<>();
+
+	// 인증서 - 일반 유저용
+	@OneToMany(mappedBy = "user")
+	@Builder.Default
+	@ToString.Exclude
+	private List<Certification> certifications = new ArrayList<>();
+
 }
