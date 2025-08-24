@@ -81,7 +81,10 @@ public class User extends BaseEntity{
 	@ToString.Exclude
 	private List<ActivityReview> activityReviews = new ArrayList<>();
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(
+			mappedBy = "user",
+			cascade = CascadeType.ALL
+	)
 	@Builder.Default
 	@ToString.Exclude
 	private List<Likes> likes = new ArrayList<>();

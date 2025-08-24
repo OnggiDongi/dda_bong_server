@@ -42,14 +42,7 @@ public class SupportRequest extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "activity_post_id",
-		foreignKey = @ForeignKey(
-			name = "fk_SupportRequest_ActivityPost",
-			foreignKeyDefinition = """
-					foreign key (activity_post_id)
-					   references ActivityPost(id)
-					    on DELETE set null on UPDATE cascade
-				"""
-		)
+		foreignKey = @ForeignKey(name = "fk_SupportRequest_ActivityPost")
 	)
 	private ActivityPost activityPost;
 

@@ -25,14 +25,7 @@ public class Likes extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(
 		name = "user_id",
-		foreignKey = @ForeignKey(
-			name = "fk_Likes_User",
-			foreignKeyDefinition = """
-					foreign key (user_id)
-					   references User(id)
-					    on DELETE cascade on UPDATE cascade
-				"""
-		)
+		foreignKey = @ForeignKey(name = "fk_Likes_User")
 	)
 	@ToString.Exclude
 	private User user;
@@ -40,14 +33,7 @@ public class Likes extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(
 		name = "activity_post_id",
-		foreignKey = @ForeignKey(
-			name = "fk_Likes_ActivityPost",
-			foreignKeyDefinition = """
-					foreign key (activity_post_id)
-					   references ActivityPost(id)
-					    on DELETE cascade on UPDATE cascade
-				"""
-		)
+		foreignKey = @ForeignKey(name = "fk_Likes_ActivityPost")
 	)
 	@ToString.Exclude
 	private ActivityPost activityPost;

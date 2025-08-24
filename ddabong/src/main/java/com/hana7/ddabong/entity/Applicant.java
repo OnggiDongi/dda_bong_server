@@ -48,7 +48,7 @@ public class Applicant extends BaseEntity{
 	@JoinColumn(
 		name = "user_id",
 		foreignKey = @ForeignKey(
-			name = "fk_Likes_User",
+			name = "fk_Applicants_User",
 			foreignKeyDefinition = """
 					foreign key (user_id)
 					   references User(id)
@@ -62,14 +62,7 @@ public class Applicant extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(
 		name = "activity_post_id",
-		foreignKey = @ForeignKey(
-			name = "fk_Likes_ActivityPost",
-			foreignKeyDefinition = """
-					foreign key (activity_post_id)
-					   references ActivityPost(id)
-					    on DELETE cascade on UPDATE cascade
-				"""
-		)
+		foreignKey = @ForeignKey(name = "fk_Applicants_ActivityPost")
 	)
 	@ToString.Exclude
 	private ActivityPost activityPost;

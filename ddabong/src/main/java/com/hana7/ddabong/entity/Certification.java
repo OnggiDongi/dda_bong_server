@@ -37,7 +37,7 @@ public class Certification extends BaseEntity{
 	@JoinColumn(
 		name = "user_id",
 		foreignKey = @ForeignKey(
-			name = "fk_Likes_User",
+			name = "fk_Certification_User",
 			foreignKeyDefinition = """
 					foreign key (user_id)
 					   references User(id)

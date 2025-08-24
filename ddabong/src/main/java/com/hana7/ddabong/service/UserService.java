@@ -20,8 +20,7 @@ import java.util.Optional;
 public class UserService {
 
 	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+	private final PasswordEncoder passwordEncoder;
 
 	public void signup(UserRequestDTO userRequestDTO) {
 		// 같은 아이디 있는지 확인하기
