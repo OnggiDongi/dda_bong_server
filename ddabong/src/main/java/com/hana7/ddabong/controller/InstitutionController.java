@@ -1,9 +1,10 @@
 package com.hana7.ddabong.controller;
 
+import com.hana7.ddabong.dto.InstitutionRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
-import com.hana7.ddabong.service.UserService;
+import com.hana7.ddabong.service.InstitutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,25 +20,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/institutions")
 @RequiredArgsConstructor
-@RequestMapping("/users")
-public class UserController {
-	private final UserService userService;
+public class InstitutionController {
 
-	@Tag(name = "회원가입 - 일반회원")
-	@Operation(summary = "모든 사용자는 아이디, 비밀번호, 이름, 전화번호, 생년월일을 통해 회원가입을 할 수 있다.")
+	private final InstitutionService institutionService;
+
+	@Tag(name = "회원가입- 기관")
+	@Operation(summary = "모든 기관 아이디, 비밀번호, 기관명, 전화번호를 통해 회원가입을 할 수 있다.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "회원가입에 성공했습니다.", content = @Content(mediaType = "application/json")),
-			@ApiResponse(responseCode = "400",
-					description = "생년월일이 현재보다 미래일 수 없습니다.",
-					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))),
 			@ApiResponse(responseCode = "409",
-					description = "이미 존재하는 회원입니다.",
+					description = "이미 존재하는 기관입니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConflictException.class)))
 	})
 	@PostMapping("/signup")
-	public ResponseEntity<?> signUser(@Validated @RequestBody UserRequestDTO userRequestDTO){
-		userService.signup(userRequestDTO);
+	public ResponseEntity<?> signUser(@Validated @RequestBody InstitutionRequestDTO institutionRequestDTO){
+		institutionService.signUp(institutionRequestDTO);
 		return ResponseEntity.ok().build();
 	}
 }

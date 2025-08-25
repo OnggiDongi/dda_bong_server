@@ -51,4 +51,12 @@ public class SwaggerConfig {
 				.pathsToMatch("/users/**")      // 이 경로 하위만 포함
 				.build();
 	}
+
+	@Bean
+	public GroupedOpenApi institutionsApi() {
+		return GroupedOpenApi.builder()
+				.group("institutions")
+				.pathsToMatch("/institutions/**")
+				.build();
+	}
 }
