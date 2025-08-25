@@ -61,8 +61,8 @@ public class UserController {
         return ResponseEntity.ok(userService.findActivityHistory(id));
     }
 
-	@Tag(name = "회원가입")
-	@Operation(summary = "모든 사용자는 아이디, 비밀번호, 닉네임을 통해 회원가입을 할 수 있다.")
+	@Tag(name = "회원가입 - 일반회원")
+	@Operation(summary = "모든 사용자는 아이디, 비밀번호, 이름, 전화번호, 생년월일을 통해 회원가입을 할 수 있다.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "회원가입에 성공했습니다.", content = @Content(mediaType = "application/json")),
 			@ApiResponse(responseCode = "400",
