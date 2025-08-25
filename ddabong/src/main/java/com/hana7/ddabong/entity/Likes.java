@@ -44,12 +44,7 @@ public class Likes extends BaseEntity{
 	@JoinColumn(
 		name = "activity_post_id",
 		foreignKey = @ForeignKey(
-			name = "fk_Likes_ActivityPost",
-			foreignKeyDefinition = """
-					foreign key (activity_post_id)
-					   references ActivityPost(id)
-					    on DELETE cascade on UPDATE cascade
-				"""
+			name = "fk_Likes_ActivityPost"
 		)
 	)
 	@ToString.Exclude

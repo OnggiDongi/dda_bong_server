@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -86,17 +87,26 @@ public class ActivityPost extends BaseEntity {
 	)
 	private Activity activity;
 
-	@OneToMany(mappedBy = "activityPost")
+	@OneToMany(
+		mappedBy = "activityPost",
+		cascade =  CascadeType.ALL
+	)
 	@Builder.Default
 	@ToString.Exclude
 	private List<SupportRequest> supportRequests = new ArrayList<>();
 
-	@OneToMany(mappedBy = "activityPost")
+	@OneToMany(
+		mappedBy = "activityPost",
+		cascade =  CascadeType.ALL
+	)
 	@Builder.Default
 	@ToString.Exclude
 	private List<Likes> likes = new ArrayList<>();
 
-	@OneToMany(mappedBy = "activityPost")
+	@OneToMany(
+		mappedBy = "activityPost",
+		cascade =  CascadeType.ALL
+	)
 	@Builder.Default
 	@ToString.Exclude
 	private List<Applicant>	applicants = new ArrayList<>();

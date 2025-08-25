@@ -49,12 +49,7 @@ public class UserReview extends BaseEntity{
 	@JoinColumn(
 		name = "user_id",
 		foreignKey = @ForeignKey(
-			name = "fk_UserReview_User",
-			foreignKeyDefinition = """
-					foreign key (user_id)
-					   references User(id)
-					    on DELETE set null on UPDATE cascade
-				"""
+			name = "fk_UserReview_User"
 		)
 	)
 	@ToString.Exclude
