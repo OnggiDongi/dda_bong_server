@@ -4,6 +4,8 @@ import com.hana7.ddabong.auth.JwtAuthenticationFilter;
 import com.hana7.ddabong.handler.CustomAccessDeniedHandler;
 import com.hana7.ddabong.handler.LoginFailureHandler;
 import com.hana7.ddabong.handler.LoginSuccessHandler;
+import com.hana7.ddabong.service.CustomOAuthService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +27,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @Log4j2
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final LoginSuccessHandler loginSuccessHandler;
+	private final LoginFailureHandler loginFailureHandler;
+	private final CustomOAuthService customOAuthService;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,8 +47,15 @@ public class SecurityConfig {
 				.cors(config -> config.configurationSource(corsConfigurationSource()))
 				.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.formLogin(form -> form
-						.successHandler(new LoginSuccessHandler())
-						.failureHandler(new LoginFailureHandler())
+						.loginPage("/users/signin")
+						.successHandler(loginSuccessHandler)
+						.failureHandler(loginFailureHandler)
+				)
+				// Oauth설정
+				.oauth2Login(customConfigurer -> customConfigurer
+						.successHandler(loginSuccessHandler)
+						.failureHandler(loginFailureHandler)
+						.userInfoEndpoint(endpointConfig -> endpointConfig.userService(customOAuthService))
 				)
 				.exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()))
 				.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

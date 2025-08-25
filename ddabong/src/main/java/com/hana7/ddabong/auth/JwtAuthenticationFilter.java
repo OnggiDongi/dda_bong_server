@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			"/*.html",
 			"/swagger-ui/**",
 			"/v3/api-docs/**",
-			"/upload/**"
+			"/upload/**",
+			"/kakao/login"
 	};
 
 	@Override
@@ -49,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 									@NonNull FilterChain filterChain) throws ServletException, IOException {
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		try {
+			System.out.println();
 			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 

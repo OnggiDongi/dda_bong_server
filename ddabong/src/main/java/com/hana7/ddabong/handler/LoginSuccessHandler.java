@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
+@Component
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 

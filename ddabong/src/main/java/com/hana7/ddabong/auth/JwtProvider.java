@@ -1,12 +1,14 @@
 package com.hana7.ddabong.auth;
 
 import com.hana7.ddabong.dto.MemberDTO;
+import com.hana7.ddabong.dto.OauthUserDTO;
 import com.hana7.ddabong.exception.CustomJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -35,10 +37,25 @@ public class JwtProvider {
 	}
 
 	public static Map<String, Object> getClaims(Authentication authentication) {
-		MemberDTO d = (MemberDTO) authentication.getPrincipal();
+		System.out.println("authentication.getPrincipal() = " + authentication.getPrincipal());
+		MemberDTO dto;
+		Map<String, Object> claims =  new HashMap<>();
 
-		MemberDTO dto = new MemberDTO(d.getEmail(), "", d.getName());
-		Map<String, Object> claims = dto.getClaims();
+		if (authentication.getPrincipal() instanceof MemberDTO d) { // 일반 로그인
+			dto = new MemberDTO(d.getEmail(), "", d.getName());
+		} else { // 카카오 로그인
+			DefaultOAuth2User d = (DefaultOAuth2User) authentication.getPrincipal();
+
+			Map<String, Object> properties = (Map<String, Object>) d.getAttributes().get("properties");
+			String name = properties.get("nickname").toString();
+
+			Map<String, Object> kakao_account = (Map<String, Object>) d.getAttributes().get("kakao_account");
+			String email = kakao_account.get("email").toString();
+
+			dto = new MemberDTO(email, "", name);
+		}
+		claims = dto.getClaims();
+
 
 		String accessToken  = generateToken(new HashMap<>(claims), 10);
 		String refreshToken = generateToken(new HashMap<>(claims), 60 * 24);
