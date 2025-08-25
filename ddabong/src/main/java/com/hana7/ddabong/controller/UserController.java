@@ -1,11 +1,15 @@
 package com.hana7.ddabong.controller;
 
+import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
+import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -22,6 +26,21 @@ public class UserController {
     @PostMapping("/{id}/onboarding")
     public ResponseEntity<UserResponseDTO> updateUserOnboardingInfo(@PathVariable Long id, @RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO) {
         return ResponseEntity.ok(userService.updateOnboardingInfo(id, userOnboardingRequestDTO));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        return ResponseEntity.ok(userService.updateUser(id, userUpdateRequestDTO));
+    }
+
+    @GetMapping("/{id}/likes")
+    public ResponseEntity<List<ActivityPostResponseDTO>> getLikedActivities(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findLikedActivities(id));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<ActivityPostResponseDTO>> getActivityHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findActivityHistory(id));
     }
 
 
