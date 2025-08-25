@@ -42,7 +42,9 @@ public class SupportRequest extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "activity_post_id",
-		foreignKey = @ForeignKey(name = "fk_SupportRequest_ActivityPost")
+		foreignKey = @ForeignKey(
+			name = "fk_SupportRequest_ActivityPost"
+		)
 	)
 	private ActivityPost activityPost;
 

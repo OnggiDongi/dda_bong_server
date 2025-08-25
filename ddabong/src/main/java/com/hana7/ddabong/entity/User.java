@@ -62,6 +62,9 @@ public class User extends BaseEntity{
 	@Column(name = "preferred_region", length = 30)
 	private String preferredRegion;
 
+	@Column(name = "profile_image", length = 255)
+	private String profileImage;
+
 	@ElementCollection(targetClass = Category.class)
 	@Enumerated(EnumType.STRING)
 	@Column(name = "preferred_category")

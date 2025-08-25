@@ -33,7 +33,9 @@ public class Likes extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(
 		name = "activity_post_id",
-		foreignKey = @ForeignKey(name = "fk_Likes_ActivityPost")
+		foreignKey = @ForeignKey(
+			name = "fk_Likes_ActivityPost"
+		)
 	)
 	@ToString.Exclude
 	private ActivityPost activityPost;
