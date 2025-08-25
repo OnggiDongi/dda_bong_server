@@ -1,5 +1,6 @@
 package com.hana7.ddabong.entity;
 
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.Column;
@@ -21,7 +22,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserReview extends BaseEntity{

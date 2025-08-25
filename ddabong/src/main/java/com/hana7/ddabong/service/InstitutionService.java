@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class InstitutionService {
@@ -34,19 +36,38 @@ public class InstitutionService {
 		Institution institution = institutionRepository.findById(id)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
+		if(institution.getDeletedAt() != null){
+			throw new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION);
+		}
+
 		return toDto(institution);
 	}
 
 	@Transactional
-	public void update(String email,  InstitutionRequestDTO institutionRequestDTO){
-		System.out.println(email);
+	public void update(String email, InstitutionRequestDTO institutionRequestDTO){
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		if(institution.getDeletedAt() != null){
+			throw new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION);
+		}
 
 		institution = institution.toBuilder()
 				.name(institutionRequestDTO.getName())
 				.email(institutionRequestDTO.getEmail())
 				.phoneNumber(institutionRequestDTO.getPhoneNumber())
+				.build();
+
+		institutionRepository.save(institution);
+	}
+
+	@Transactional
+	public void delete(String email){
+		Institution institution = institutionRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		institution = institution.toBuilder()
+				.deletedAt(LocalDateTime.now())
 				.build();
 
 		institutionRepository.save(institution);

@@ -69,4 +69,20 @@ public class InstitutionController {
 		institutionService.update(email, institutionRequestDTO);
 		return ResponseEntity.ok().build();
 	}
+
+	@Tag(name = "기관 탈퇴하기")
+	@Operation(summary = "기관이 탈퇴할 수 있다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "기관 탈퇴에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404",
+					description = "존재하지 않는 기관입니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+	@DeleteMapping("")
+	public ResponseEntity<?> getInstitutionInfo(Authentication authentication){
+		String email = authentication.getName();
+		System.out.println("email = " + email);
+		institutionService.delete(email);
+		return ResponseEntity.ok().build();
+	}
 }
