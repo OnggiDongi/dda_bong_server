@@ -1,9 +1,11 @@
 package com.hana7.ddabong.controller;
 
 import com.hana7.ddabong.dto.InstitutionRequestDTO;
+import com.hana7.ddabong.dto.InstitutionResponseDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
+import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.InstitutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,12 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/institutions")
@@ -38,5 +38,19 @@ public class InstitutionController {
 	public ResponseEntity<?> signUser(@Validated @RequestBody InstitutionRequestDTO institutionRequestDTO){
 		institutionService.signUp(institutionRequestDTO);
 		return ResponseEntity.ok().build();
+	}
+
+	@Tag(name = "기관 정보 조회하기")
+	@Operation(summary = "기관의 정보를 확인할 수 있다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "기관 조회를 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404",
+					description = "존재하지 않는 기관입니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+	@GetMapping("/{id}")
+	public ResponseEntity<InstitutionResponseDTO> getInstitutionInfo(@PathVariable Long id){
+		InstitutionResponseDTO institutionInfo = institutionService.getInstitutionInfo(id);
+		return ResponseEntity.status(HttpStatus.OK).body(institutionInfo);
 	}
 }
