@@ -48,8 +48,7 @@ public class UserController {
     @PatchMapping("/update")
     public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
         String email = authentication.getName();
-        Long id = userService.getUserIdByEmail(email);
-        return ResponseEntity.ok(userService.updateUser(id, userUpdateRequestDTO));
+        return ResponseEntity.ok(userService.updateUser(email, userUpdateRequestDTO));
     }
 
     @GetMapping("/{id}/likes")

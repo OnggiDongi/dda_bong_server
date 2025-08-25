@@ -21,7 +21,6 @@ public class UserResponseDTO {
     private String phoneNumber;
     private int totalHour;
     private LocalDate birthdate;
-    private boolean isKakao;
     private String preferredRegion;
     private String profileImage;
     private List<String> preferredCategory;

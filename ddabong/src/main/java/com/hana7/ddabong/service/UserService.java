@@ -1,21 +1,29 @@
 package com.hana7.ddabong.service;
 
-<<<<<<< HEAD
 import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
+import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
 import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.entity.Likes;
 import com.hana7.ddabong.entity.User;
+import com.hana7.ddabong.enums.ErrorCode;
+import com.hana7.ddabong.exception.BadRequestException;
+import com.hana7.ddabong.exception.ConflictException;
+import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.repository.ApplicantRepository;
 import com.hana7.ddabong.repository.LikesRepository;
 import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,14 +31,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final UserRepository userRepository;
     private final LikesRepository likesRepository;
+    private final UserRepository userRepository;
     private final ApplicantRepository applicantRepository;
+	private final PasswordEncoder passwordEncoder;
 
-    public Long getUserIdByEmail(String email) {
-        return userRepository.findIdByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 유저가 없습니다: " + email));
-    }
 
     public UserResponseDTO findUserById(Long id) {
         User user = userRepository.findById(id)
@@ -54,14 +59,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO userUpdateReq) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+    public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Email : " + email + "인 회원이 없습니다"));
+
+		String encodedPassword = passwordEncoder.encode(userUpdateRequestDTO.getPassword());
 
         User updatedUser = user.toBuilder()
-            .name(userUpdateReq.getName())
-            .phoneNumber(userUpdateReq.getPhoneNumber())
-            .password(userUpdateReq.getPassword()) // TODO: password encoding~~~
+            .name(userUpdateRequestDTO.getName())
+            .phoneNumber(userUpdateRequestDTO.getPhoneNumber())
+            .password(encodedPassword)
             .build();
 
         userRepository.save(updatedUser);
@@ -96,7 +103,6 @@ public class UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .totalHour(user.getTotalHour())
                 .birthdate(user.getBirthdate())
-                .isKakao(user.isKakao())
                 .preferredRegion(user.getPreferredRegion())
                 .profileImage(user.getProfileImage())
                 .preferredCategory(user.getPreferredCategory().stream()
@@ -105,28 +111,7 @@ public class UserService {
                 .build();
     }
 
-=======
-import com.hana7.ddabong.dto.UserRequestDTO;
-import com.hana7.ddabong.entity.User;
-import com.hana7.ddabong.enums.ErrorCode;
-import com.hana7.ddabong.exception.BadRequestException;
-import com.hana7.ddabong.exception.ConflictException;
-import com.hana7.ddabong.exception.NotFoundException;
-import com.hana7.ddabong.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
-@Service
-@RequiredArgsConstructor
-public class UserService {
-
-	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
 
 	public void signup(UserRequestDTO userRequestDTO) {
 		// 같은 아이디 있는지 확인하기
@@ -160,5 +145,4 @@ public class UserService {
 		// 이미 있는 회원일 경우
 		throw new ConflictException(ErrorCode.CONFLICT_USER);
 	}
->>>>>>> 9c2f849b2a16ebf6f963ede911ea10c4bfe98f78
 }
