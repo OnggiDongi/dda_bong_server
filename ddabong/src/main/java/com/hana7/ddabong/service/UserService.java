@@ -1,5 +1,6 @@
 package com.hana7.ddabong.service;
 
+import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
 import com.hana7.ddabong.entity.User;
 import com.hana7.ddabong.repository.UserRepository;
@@ -22,17 +23,21 @@ public class UserService {
         return toDTO(user);
     }
 
-    // @Transactional
-    // public UserResponseDTO updateUserPreferences(Long id, UserPreferenceRequestDTO requestDTO) {
-    //     User user = userRepository.findById(id)
-    //             .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
-    //
-    //     user.setPreferredRegion(requestDTO.getPreferredRegion());
-    //     user.setPreferredCategory(requestDTO.getPreferredCategory());
-    //
-    //     User updatedUser = userRepository.save(user);
-    //     return toDTO(updatedUser);
-    // }
+    @Transactional
+    public UserResponseDTO updateOnboardingInfo(Long id, UserOnboardingRequestDTO userOnboardingRequestDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+
+        user = user.toBuilder()
+                .preferredRegion(userOnboardingRequestDTO.getPreferredRegion())
+                .preferredCategory(userOnboardingRequestDTO.getPreferredCategory())
+                .build();
+
+        userRepository.save(user);
+
+        return toDTO(user);
+    }
+
 
     private UserResponseDTO toDTO(User user) {
         return UserResponseDTO.builder()
