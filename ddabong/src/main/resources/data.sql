@@ -5,7 +5,6 @@ INSERT INTO institution (id, name, email, password, phone_number, detail) VALUES
 (3, '카카오', 'kakao@kakao.com', '1234', '010-5555-5555', '카카오입니다.'),
 (4, '삼성', 'ㅌsamsung@samsung.com', '1234', '010-6666-6666', '삼성입니다.'),
 (5, '개미인력', 'lg@lg.com', '1234', '010-7777-7777', '안녕하세요. 개미인력입니다.');
-
 -- User
 INSERT INTO user (id, name, email, password, phone_number, total_hour, birthdate, is_kakao, preferred_region) VALUES
 (1, '김봉사', 'kim@ddabong.com', '1234', '010-3333-3333', 10, '1990-01-01', false, '서울'),
