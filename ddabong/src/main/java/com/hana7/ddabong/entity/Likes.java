@@ -8,12 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @NoArgsConstructor
@@ -28,14 +25,7 @@ public class Likes extends BaseEntity{
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(
 		name = "user_id",
-		foreignKey = @ForeignKey(
-			name = "fk_Likes_User",
-			foreignKeyDefinition = """
-					foreign key (user_id)
-					   references User(id)
-					    on DELETE cascade on UPDATE cascade
-				"""
-		)
+		foreignKey = @ForeignKey(name = "fk_Likes_User")
 	)
 	@ToString.Exclude
 	private User user;

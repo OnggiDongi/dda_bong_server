@@ -19,6 +19,7 @@ import lombok.ToString;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
