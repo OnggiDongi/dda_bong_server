@@ -1,6 +1,5 @@
 package com.hana7.ddabong.controller;
 
-import com.hana7.ddabong.dto.UserPreferenceRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
 import com.hana7.ddabong.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,8 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
-    @PutMapping("/preferences")
-    public ResponseEntity<UserResponseDTO> updateUserPreferences(@PathVariable Long id, @RequestBody UserPreferenceRequestDTO requestDTO) {
-        return ResponseEntity.ok(userService.updateUserPreferences(id, requestDTO));
-    }
+    // @PutMapping("/preferences")
+    // public ResponseEntity<UserResponseDTO> updateUserPreferences(@PathVariable Long id, @RequestBody UserPreferenceRequestDTO requestDTO) {
+    //     return ResponseEntity.ok(userService.updateUserPreferences(id, requestDTO));
+    // }
 }
