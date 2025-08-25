@@ -1,6 +1,7 @@
 package com.hana7.ddabong.dto;
 
 import com.hana7.ddabong.entity.ActivityPost;
+import com.hana7.ddabong.enums.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,21 +16,19 @@ import java.time.LocalDateTime;
 public class ActivityPostResponseDTO {
     private Long id;
     private String title;
-    private String content;
-    private LocalDateTime startAt;
     private LocalDateTime endAt;
     private String location;
     private String imageUrl;
+    private Category category;
 
     public static ActivityPostResponseDTO of(ActivityPost activityPost) {
         return ActivityPostResponseDTO.builder()
                 .id(activityPost.getId())
                 .title(activityPost.getTitle())
-                .content(activityPost.getContent())
-                .startAt(activityPost.getStartAt())
                 .endAt(activityPost.getEndAt())
                 .location(activityPost.getLocation())
                 .imageUrl(activityPost.getImageUrl())
+                .category(activityPost.getActivity().getCategory())
                 .build();
     }
 }

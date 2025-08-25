@@ -7,6 +7,7 @@ import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,10 @@ public class UserController {
         return ResponseEntity.ok(userService.updateOnboardingInfo(id, userOnboardingRequestDTO));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+    @PatchMapping("/update")
+    public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+        String email = authentication.getName();
+        Long id = userService.getUserIdByEmail(email);
         return ResponseEntity.ok(userService.updateUser(id, userUpdateRequestDTO));
     }
 
@@ -42,6 +45,7 @@ public class UserController {
     public ResponseEntity<List<ActivityPostResponseDTO>> getActivityHistory(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findActivityHistory(id));
     }
+
 
 
 }

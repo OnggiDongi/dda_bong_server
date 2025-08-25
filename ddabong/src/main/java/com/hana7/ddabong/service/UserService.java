@@ -26,6 +26,11 @@ public class UserService {
     private final LikesRepository likesRepository;
     private final ApplicantRepository applicantRepository;
 
+    public Long getUserIdByEmail(String email) {
+        return userRepository.findIdByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 유저가 없습니다: " + email));
+    }
+
     public UserResponseDTO findUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
@@ -48,29 +53,19 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO userUpdateRequestDTO) {
+    public UserResponseDTO updateUser(Long id, UserUpdateRequestDTO userUpdateReq) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+            .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
 
-        User.UserBuilder userBuilder = user.toBuilder();
+        User updatedUser = user.toBuilder()
+            .name(userUpdateReq.getName())
+            .phoneNumber(userUpdateReq.getPhoneNumber())
+            .password(userUpdateReq.getPassword()) // TODO: password encoding~~~
+            .build();
 
-        if (userUpdateRequestDTO.getName() != null) {
-            userBuilder.name(userUpdateRequestDTO.getName());
-        }
-        if (userUpdateRequestDTO.getPhoneNumber() != null) {
-            userBuilder.phoneNumber(userUpdateRequestDTO.getPhoneNumber());
-        }
-        if (userUpdateRequestDTO.getPassword() != null) {
-            // TODO: Add password encoding
-            userBuilder.password(userUpdateRequestDTO.getPassword());
-        }
-        if (userUpdateRequestDTO.getBirthdate() != null) {
-            userBuilder.birthdate(userUpdateRequestDTO.getBirthdate());
-        }
+        userRepository.save(updatedUser);
 
-        userRepository.save(userBuilder.build());
-
-        return toDTO(userBuilder.build());
+        return toDTO(updatedUser);
     }
 
     public List<ActivityPostResponseDTO> findLikedActivities(Long userId) {
@@ -108,4 +103,5 @@ public class UserService {
                         .collect(Collectors.toList()))
                 .build();
     }
+
 }

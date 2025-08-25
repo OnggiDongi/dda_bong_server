@@ -26,7 +26,4 @@ public class UserUpdateRequestDTO {
     @Size(min = 1, max = 60, message = "1자 이상 60자 이내로 입력해주세요.")
     private String password;
 
-    @NotBlank(message = "생년월일은 필수입니다.")
-    @Size(min = 1, max = 30, message = "입력해주세요.")
-    private LocalDate birthdate;
 }
