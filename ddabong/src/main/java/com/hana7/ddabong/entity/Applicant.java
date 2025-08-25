@@ -64,11 +64,6 @@ public class Applicant extends BaseEntity{
 		name = "activity_post_id",
 		foreignKey = @ForeignKey(
 			name = "fk_Applicant_ActivityPost"
-			// foreignKeyDefinition = """
-			// 		foreign key (activity_post_id)
-			// 		   references ActivityPost(id)
-			// 		    on DELETE cascade on UPDATE cascade
-			// 	"""
 		)
 	)
 	@ToString.Exclude

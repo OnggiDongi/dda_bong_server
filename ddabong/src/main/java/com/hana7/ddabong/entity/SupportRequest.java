@@ -46,12 +46,6 @@ public class SupportRequest extends BaseEntity{
 		name = "activity_post_id",
 		foreignKey = @ForeignKey(
 			name = "fk_SupportRequest_ActivityPost"
-		// 	foreignKeyDefinition = """
-		// 			foreign key (activity_post_id)
-		// 			   references ActivityPost(id)
-		// 			    on DELETE cascade on UPDATE cascade
-		// 		"""
-		//
 		)
 	)
 	private ActivityPost activityPost;
