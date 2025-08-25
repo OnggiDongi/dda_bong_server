@@ -53,7 +53,7 @@ public class UserReview extends BaseEntity{
 			foreignKeyDefinition = """
 					foreign key (user_id)
 					   references User(id)
-					    on DELETE set null on UPDATE cascade
+					    on DELETE cascade on UPDATE cascade
 				"""
 		)
 	)

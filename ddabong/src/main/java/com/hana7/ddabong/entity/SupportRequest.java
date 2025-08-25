@@ -45,12 +45,13 @@ public class SupportRequest extends BaseEntity{
 	@JoinColumn(
 		name = "activity_post_id",
 		foreignKey = @ForeignKey(
-			name = "fk_SupportRequest_ActivityPost",
-			foreignKeyDefinition = """
-					foreign key (activity_post_id)
-					   references ActivityPost(id)
-					    on DELETE set null on UPDATE cascade
-				"""
+			name = "fk_SupportRequest_ActivityPost"
+		// 	foreignKeyDefinition = """
+		// 			foreign key (activity_post_id)
+		// 			   references ActivityPost(id)
+		// 			    on DELETE cascade on UPDATE cascade
+		// 		"""
+		//
 		)
 	)
 	private ActivityPost activityPost;
