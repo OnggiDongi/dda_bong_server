@@ -2,6 +2,7 @@ package com.hana7.ddabong.entity;
 
 import java.math.BigDecimal;
 
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.hana7.ddabong.enums.ApprovalStatus;
@@ -27,7 +28,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Applicant extends BaseEntity{
