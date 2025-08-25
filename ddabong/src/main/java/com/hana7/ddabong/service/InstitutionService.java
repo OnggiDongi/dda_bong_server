@@ -37,6 +37,21 @@ public class InstitutionService {
 		return toDto(institution);
 	}
 
+	@Transactional
+	public void update(String email,  InstitutionRequestDTO institutionRequestDTO){
+		System.out.println(email);
+		Institution institution = institutionRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		institution = institution.toBuilder()
+				.name(institutionRequestDTO.getName())
+				.email(institutionRequestDTO.getEmail())
+				.phoneNumber(institutionRequestDTO.getPhoneNumber())
+				.build();
+
+		institutionRepository.save(institution);
+	}
+
 	private InstitutionResponseDTO toDto(Institution institution){
 		return InstitutionResponseDTO.builder()
 				.id(institution.getId())

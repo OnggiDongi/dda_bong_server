@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,5 +53,20 @@ public class InstitutionController {
 	public ResponseEntity<InstitutionResponseDTO> getInstitutionInfo(@PathVariable Long id){
 		InstitutionResponseDTO institutionInfo = institutionService.getInstitutionInfo(id);
 		return ResponseEntity.status(HttpStatus.OK).body(institutionInfo);
+	}
+
+	@Tag(name = "기관 정보 수정하기")
+	@Operation(summary = "기관이 자신의 정보를 수정할 수 있다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "기관 정보 수정을 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404",
+					description = "존재하지 않는 기관입니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+	@PatchMapping("")
+	public ResponseEntity<?> getInstitutionInfo(Authentication authentication, @Validated @RequestBody InstitutionRequestDTO institutionRequestDTO){
+		String email = authentication.getName();
+		institutionService.update(email, institutionRequestDTO);
+		return ResponseEntity.ok().build();
 	}
 }
