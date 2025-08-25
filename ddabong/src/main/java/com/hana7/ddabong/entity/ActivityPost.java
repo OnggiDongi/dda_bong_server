@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
@@ -78,12 +79,7 @@ public class ActivityPost extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "activity_id",
-		foreignKey = @ForeignKey(name = "fk_ActivityPost_Activity",
-			foreignKeyDefinition = """
-					foreign key (activity_id)
-					references Activity(id)
-					on DELETE set null on UPDATE cascade
-				""")
+		foreignKey = @ForeignKey(name = "fk_ActivityPost_Activity")
 	)
 	private Activity activity;
 
