@@ -1,26 +1,117 @@
 package com.hana7.ddabong.service;
 
+import com.hana7.ddabong.dto.ActivityPostResponseDTO;
+import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
+import com.hana7.ddabong.dto.UserResponseDTO;
+import com.hana7.ddabong.dto.UserUpdateRequestDTO;
+import com.hana7.ddabong.entity.Applicant;
+import com.hana7.ddabong.entity.Likes;
 import com.hana7.ddabong.entity.User;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
+import com.hana7.ddabong.repository.ApplicantRepository;
+import com.hana7.ddabong.repository.LikesRepository;
 import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
-	private final UserRepository userRepository;
+    private final LikesRepository likesRepository;
+    private final UserRepository userRepository;
+    private final ApplicantRepository applicantRepository;
 	private final PasswordEncoder passwordEncoder;
+
+
+    public UserResponseDTO findUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+        return toDTO(user);
+    }
+
+    @Transactional
+    public UserResponseDTO updateOnboardingInfo(Long id, UserOnboardingRequestDTO userOnboardingRequestDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+
+        user = user.toBuilder()
+                .preferredRegion(userOnboardingRequestDTO.getPreferredRegion())
+                .preferredCategory(userOnboardingRequestDTO.getPreferredCategory())
+                .build();
+
+        userRepository.save(user);
+
+        return toDTO(user);
+    }
+
+    @Transactional
+    public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Email : " + email + "인 회원이 없습니다"));
+
+		String encodedPassword = passwordEncoder.encode(userUpdateRequestDTO.getPassword());
+
+        User updatedUser = user.toBuilder()
+            .name(userUpdateRequestDTO.getName())
+            .phoneNumber(userUpdateRequestDTO.getPhoneNumber())
+            .password(encodedPassword)
+            .build();
+
+        userRepository.save(updatedUser);
+
+        return toDTO(updatedUser);
+    }
+
+    public List<ActivityPostResponseDTO> findLikedActivities(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Id : " + userId + "인 회원이 없습니다"));
+        List<Likes> likes = likesRepository.findByUser(user);
+        return likes.stream()
+                .map(like -> ActivityPostResponseDTO.of(like.getActivityPost()))
+                .collect(Collectors.toList());
+    }
+
+    public List<ActivityPostResponseDTO> findActivityHistory(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Id : " + userId + "인 회원이 없습니다"));
+        List<Applicant> applicants = applicantRepository.findByUser(user);
+        return applicants.stream()
+                .map(applicant -> ActivityPostResponseDTO.of(applicant.getActivityPost()))
+                .collect(Collectors.toList());
+    }
+
+
+    private UserResponseDTO toDTO(User user) {
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .totalHour(user.getTotalHour())
+                .birthdate(user.getBirthdate())
+                .preferredRegion(user.getPreferredRegion())
+                .profileImage(user.getProfileImage())
+                .preferredCategory(user.getPreferredCategory().stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+
 
 	public void signup(UserRequestDTO userRequestDTO) {
 		// 같은 아이디 있는지 확인하기
