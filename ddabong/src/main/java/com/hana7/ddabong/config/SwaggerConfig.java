@@ -67,4 +67,11 @@ public class SwaggerConfig {
 			.pathsToMatch("/certifications/**")
 			.build();
 	}
+	@Bean
+	public GroupedOpenApi activityApi() {
+		return GroupedOpenApi.builder()
+			.group("activity")
+			.pathsToMatch("/activity/**")
+			.build();
+	}
 }
