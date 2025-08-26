@@ -30,4 +30,10 @@ public class ActivityReviewController {
         activityReviewService.createActivityReview(activityPostId, email, requestDTO);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{activityPostId}/review")
+    public ResponseEntity<List<ActivityReviewResponseDTO>> getActivityPostReviews(@PathVariable Long activityPostId) {
+        List<ActivityReviewResponseDTO> activityReviews = activityReviewService.getActivityPostReviews(activityPostId);
+        return ResponseEntity.ok(activityReviews);
+    }
 }

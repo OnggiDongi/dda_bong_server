@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ActivityReviewRepository extends JpaRepository<ActivityReview, Long> {
     List<ActivityReview> findByUser_Email(String email);
+    List<ActivityReview> findByActivity_Id(Long activityId);
 }

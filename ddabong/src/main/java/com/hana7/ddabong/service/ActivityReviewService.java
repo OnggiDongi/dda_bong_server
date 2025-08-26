@@ -47,7 +47,7 @@ public class ActivityReviewService {
         if (!isApprovedApplicant) {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_NOT_APPLICANT);
         }
-
+        // TODO :: 실제 시간과 비교하여 활동 끝났는지 확인하려면 주석 풀기. 지금은 가라데이터라 여기서 걸려서 주석처리합니다리
         // if (activityPost.getEndAt().isAfter(LocalDateTime.now())) {
         //     throw new BadRequestException(ErrorCode.BAD_REQUEST_ACTIVITY_NOT_COMPLETED);
         // }
@@ -68,6 +68,16 @@ public class ActivityReviewService {
             throw new NotFoundException(ErrorCode.NOTFOUND_USER);
         }
         return activityReviewRepository.findByUser_Email(email).stream()
+                .map(ActivityReviewResponseDTO::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ActivityReviewResponseDTO> getActivityPostReviews(Long activityPostId) {
+        ActivityPost activityPost = activityPostRepository.findById(activityPostId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+
+        Long activityId = activityPost.getActivity().getId();
+        return activityReviewRepository.findByActivity_Id(activityId).stream()
                 .map(ActivityReviewResponseDTO::toDTO)
                 .collect(Collectors.toList());
     }
