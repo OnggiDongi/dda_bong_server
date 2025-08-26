@@ -21,6 +21,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 										Authentication authentication) throws IOException {
 
+		System.out.println(authentication.getPrincipal());
 		Map<String, Object> body = JwtProvider.getClaims(authentication);
 
 		ObjectMapper objectMapper = new ObjectMapper();
