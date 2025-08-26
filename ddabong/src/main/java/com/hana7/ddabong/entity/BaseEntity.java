@@ -33,4 +33,8 @@ public class BaseEntity {
 
 	@Column(nullable = true)
 	private LocalDateTime deletedAt;
+
+	public void markDeleted() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }
