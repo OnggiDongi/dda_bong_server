@@ -8,11 +8,10 @@ import com.hana7.ddabong.enums.ApprovalStatus;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
-import com.hana7.ddabong.repository.ActivityPostRepository;
-import com.hana7.ddabong.repository.ActivityReviewRepository;
-import com.hana7.ddabong.repository.ApplicantRepository;
-import com.hana7.ddabong.repository.UserRepository;
+import com.hana7.ddabong.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +29,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ActivityPostService {
 	private final ActivityPostRepository activityPostRepository;
+	private final ActivityRepository activityRepository;
 	private final ActivityReviewRepository activityReviewRepository;
+
 	private final UserRepository userRepository;
+	private final InstitutionRepository institutionRepository;
 	private final ApplicantRepository applicantRepository;
 
 	public ActivityPostDetailResponseDTO getPost(Long id){
@@ -126,6 +128,43 @@ public class ActivityPostService {
 		// 삭제
 		applicant.markDeleted();
 		applicantRepository.save(applicant);
+	}
+
+	public List<ActivityPostResponseDTO> getMyActivityPosts(String email) {
+		Institution institution = institutionRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		List<Activity> activities = activityRepository.findByInstitution(institution);
+
+		List<ActivityPostResponseDTO> dtos = new ArrayList<>();
+		activities.forEach(
+				activity ->
+				{
+					List<ActivityPostResponseDTO> list = activity.getActivityPosts().stream()
+									.map(post -> {
+										// 지원자 총 인원 수
+										long applicants = post.getApplicants().stream()
+												.filter(applicant -> !applicant.getStatus().equals(ApprovalStatus.REJECTED))
+												.count();
+
+										return ActivityPostResponseDTO.builder()
+												.id(post.getId())
+												.title(post.getTitle())
+												.endAt(String.format(
+														"%d.%02d.%02d",
+														post.getEndAt().getYear(),
+														post.getEndAt().getMonthValue(),
+														post.getEndAt().getDayOfMonth())
+												)
+												.location(post.getLocation())
+												.imageUrl(post.getImageUrl())
+												.category(post.getActivity().getCategory())
+												.applicantNum((int) applicants)
+												.build();
+									}).toList();
+					dtos.addAll(list);}
+				);
+		return dtos;
 	}
 
 	private static ActivityReviewResponseDTO reviewToDto(ActivityReview review){
