@@ -4,7 +4,7 @@ INSERT INTO institution (id, name, email, password, phone_number, detail) VALUES
 (2, '네이버', 'naver@naver.com', '1234', '010-2222-2222', '네이버입니다.'),
 (3, '카카오', 'kakao@kakao.com', '1234', '010-5555-5555', '카카오입니다.'),
 (4, '삼성', 'ㅌsamsung@samsung.com', '1234', '010-6666-6666', '삼성입니다.'),
-(5, '개미인력', 'lg@lg.com', '1234', '010-7777-7777', '안녕하세요. 개미인력입니다.');
+(5, '개미인력', 'lg@lg.com', '$2a$10$YlakYH21qBT7qymZ4bJH7e7RUkERACdgBYSbQcU/RV8MM61KL3M3m', '010-7777-7777', '안녕하세요. 개미인력입니다.');
 
 -- User
 INSERT INTO user (id, name, email, password, phone_number, total_hour, birthdate, is_kakao, preferred_region) VALUES
@@ -61,12 +61,12 @@ INSERT INTO activity_review (id, rate, content, image_url, activity_id, user_id)
 (5, 5, '다양한 나라의 친구들을 만날 수 있어서 유익했습니다.', 'http://example.com/review5.jpg', 5, 7);
 
 -- UserReview
-INSERT INTO user_review (id, health_status, diligence_level, attitude, memo, user_id) VALUES
-(1, 5, 5, 5, '성실하고 착한 봉사자입니다.', 1), (2, 4, 4, 4, '열정적인 모습이 보기 좋았습니다.', 2),
-(3, 5, 4, 5, '시간 약속을 잘 지킵니다.', 3), (4, 3, 4, 3, '조금 더 적극적으로 참여했으면 좋겠습니다.', 4),
-(5, 5, 5, 5, '항상 웃는 얼굴로 봉사에 임합니다.', 5), (6, 4, 5, 4, '책임감이 강하고 꼼꼼합니다.', 6),
-(7, 5, 4, 5, '친화력이 좋아 다른 봉사자들과 잘 어울립니다.', 7), (8, 4, 4, 4, '묵묵히 자기 역할을 다합니다.', 8),
-(9, 5, 5, 5, '솔선수범하는 모습이 인상적입니다.', 9), (10, 4, 4, 5, '긍정적인 에너지가 넘칩니다.', 10);
+INSERT INTO user_review (id, health_status, diligence_level, attitude, memo, user_id,write_inst) VALUES
+(1, 5, 5, 5, '성실하고 착한 봉사자입니다.', 1,1), (2, 4, 4, 4, '열정적인 모습이 보기 좋았습니다.', 2,1),
+(3, 5, 4, 5, '시간 약속을 잘 지킵니다.', 3,1), (4, 3, 4, 3, '조금 더 적극적으로 참여했으면 좋겠습니다.', 4,1),
+(5, 5, 5, 5, '항상 웃는 얼굴로 봉사에 임합니다.', 5,3), (6, 4, 5, 4, '책임감이 강하고 꼼꼼합니다.', 6,2),
+(7, 5, 4, 5, '친화력이 좋아 다른 봉사자들과 잘 어울립니다.', 7,4), (8, 4, 4, 4, '묵묵히 자기 역할을 다합니다.', 8,3),
+(9, 5, 5, 5, '솔선수범하는 모습이 인상적입니다.', 9,5), (10, 4, 4, 5, '긍정적인 에너지가 넘칩니다.', 10,4);
 
 -- Certification
 INSERT INTO certification (id, hour, user_id) VALUES

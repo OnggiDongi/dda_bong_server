@@ -45,6 +45,9 @@ public class UserReview extends BaseEntity{
 	@Column(name = "memo",length = 255)
 	private String memo;
 
+	@Column(name = "write_inst",nullable = false)
+	private Long writeInst;
+
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(
 		name = "user_id",
