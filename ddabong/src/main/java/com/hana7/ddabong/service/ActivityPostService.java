@@ -87,7 +87,7 @@ public class ActivityPostService {
 
 		Optional<Applicant> tmp = applicantRepository.findByUserAndActivityPost(user, post);
 
-		if(tmp.isPresent()){ // 이미 해당 봉사활동에 신청한 유저라면
+		if(tmp.isPresent() && tmp.get().getDeletedAt() == null){ // 이미 해당 봉사활동에 신청한 유저라면
 			throw new BadRequestException(ErrorCode.BAD_REQUEST_ALREADY_APPLIED);
 		}
 		if(post.getRecruitmentEnd().isBefore(LocalDateTime.now())){ // 마감일이 지난 봉사 모집글이라면
@@ -101,6 +101,30 @@ public class ActivityPostService {
 				.status(ApprovalStatus.PENDING)
 				.build();
 
+		applicantRepository.save(applicant);
+	}
+
+	public void cancelActivity(String email, Long activityPostId){
+		ActivityPost post = activityPostRepository.findById(activityPostId)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+		Optional<Applicant> tmp = applicantRepository.findByUserAndActivityPost(user, post);
+
+		if(tmp.isEmpty()){ // 이미 해당 봉사활동에 신청한 유저라면
+			throw new NotFoundException(ErrorCode.NOTFOUND_APPLICANT);
+		}
+
+		Applicant applicant = tmp.get();
+
+		if (!applicant.getStatus().equals(ApprovalStatus.PENDING)) { // 신청 상태가 대기중일 경우만 취소 가능
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_STATUS_NOT_PENDING);
+		}
+
+		// 삭제
+		applicant.markDeleted();
 		applicantRepository.save(applicant);
 	}
 

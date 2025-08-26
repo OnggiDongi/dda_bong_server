@@ -60,4 +60,22 @@ public class ActivityPostController {
 		return ResponseEntity.ok().build();
 	}
 
+
+	@Tag(name = "봉사 모집글 지원 취소하기")
+	@Operation(summary = "일반 유저는 봉사 모집글 지원을 취소할 수 있다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404",
+					description = "해당하는 회원 또는 봉사 모집글이 존재하지 않습니다. || 회원은 해당 모집글에 지원한 이력이 없습니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
+			@ApiResponse(responseCode = "409",
+					description = "해당 지원 상태가 대기중일 경우에만 지원 취소가 가능합니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
+	})
+	@PostMapping("/{activityPostId}/reject")
+	public ResponseEntity<?> rejectActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
+		activityPostService.cancelActivity(authentication.getName(), activityPostId);
+		return ResponseEntity.ok().build();
+	}
+
 }
