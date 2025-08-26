@@ -27,7 +27,7 @@ public class ActivityController {
     }
 
     @GetMapping()
-    public List<ActivityResponseDTO> readActivityList(
+    public ResponseEntity<List<ActivityResponseDTO>> readActivityList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "") String keyWord,
@@ -37,7 +37,7 @@ public class ActivityController {
     }
 
     @GetMapping(value = "/{id}")
-    public ActivityResponseDTO readActivity(
+    public ResponseEntity<ActivityResponseDTO> readActivity(
             @PathVariable Long id,
             Authentication authentication
     ) {
