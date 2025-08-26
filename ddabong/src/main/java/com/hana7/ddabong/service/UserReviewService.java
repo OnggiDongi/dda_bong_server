@@ -60,7 +60,7 @@ public class UserReviewService {
     }
 
     public List<UserReviewResponseDTO> getUserReviews(Long userId) {
-        getLoggedInInstitution(); // Ensure only institutions can access
+        getLoggedInInstitution(); //기관만 접근 가능.
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
         }
