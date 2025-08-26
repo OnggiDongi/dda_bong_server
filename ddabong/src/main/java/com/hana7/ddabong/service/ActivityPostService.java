@@ -3,21 +3,26 @@ package com.hana7.ddabong.service;
 import com.hana7.ddabong.dto.ActivityPostDetailResponseDTO;
 import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.ActivityReviewResponseDTO;
-import com.hana7.ddabong.entity.Activity;
-import com.hana7.ddabong.entity.ActivityPost;
-import com.hana7.ddabong.entity.ActivityReview;
+import com.hana7.ddabong.entity.*;
+import com.hana7.ddabong.enums.ApprovalStatus;
 import com.hana7.ddabong.enums.ErrorCode;
+import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.repository.ActivityPostRepository;
 import com.hana7.ddabong.repository.ActivityReviewRepository;
+import com.hana7.ddabong.repository.ApplicantRepository;
+import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
@@ -26,6 +31,8 @@ import java.util.stream.Collectors;
 public class ActivityPostService {
 	private final ActivityPostRepository activityPostRepository;
 	private final ActivityReviewRepository activityReviewRepository;
+	private final UserRepository userRepository;
+	private final ApplicantRepository applicantRepository;
 
 	public ActivityPostDetailResponseDTO getPost(Long id){
 		ActivityPost post = activityPostRepository.findById(id)
@@ -68,6 +75,33 @@ public class ActivityPostService {
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
 				.build();
+	}
+
+	@Transactional
+	public void applyActivity(String email, Long activityPostId){
+		ActivityPost post = activityPostRepository.findById(activityPostId)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+		Optional<Applicant> tmp = applicantRepository.findByUserAndActivityPost(user, post);
+
+		if(tmp.isPresent()){ // 이미 해당 봉사활동에 신청한 유저라면
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_ALREADY_APPLIED);
+		}
+		if(post.getRecruitmentEnd().isBefore(LocalDateTime.now())){ // 마감일이 지난 봉사 모집글이라면
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_RECRUITMENT_DATE_EXPIRED);
+		}
+
+		Applicant applicant = Applicant.builder()
+				.activityPost(post)
+				.user(user)
+				.hours(BigDecimal.valueOf(ChronoUnit.HOURS.between(post.getStartAt(), post.getEndAt())))
+				.status(ApprovalStatus.PENDING)
+				.build();
+
+		applicantRepository.save(applicant);
 	}
 
 	private static ActivityReviewResponseDTO reviewToDto(ActivityReview review){

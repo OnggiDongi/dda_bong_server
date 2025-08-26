@@ -17,7 +17,8 @@ public enum ErrorCode {
 	BAD_REQUEST_NOT_APPLICANT(203, "해당 활동에 참여한 회원이 아닙니다."),
 	BAD_REQUEST_NO_PERMISSION(204, "해당 작업을 수행할 권한이 없습니다."),
 	BAD_REQUEST_CERTIFICATION_ACCESS_DENIED(205, "해당 인증서를 조회할 권한이 없습니다."),
-
+	BAD_REQUEST_ALREADY_APPLIED(206, "이미 해당 모집글에 봉사 신청이 완료되었습니다."),
+	BAD_REQUEST_RECRUITMENT_DATE_EXPIRED(207, "모집 마감일이 지났습니다."),
 
 	CONFLICT_USER(301, "이미 존재하는 회원입니다."),
 	CONFLICT_INSTITUTION(302, "이미 존재하는 기관입니다.");
