@@ -34,10 +34,10 @@ public class UserReviewService {
     public void createUserReview(Long userId, UserReviewRequestDTO requestDTO) {
         Institution loggedInInstitution = getLoggedInInstitution();
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         ActivityPost activityPost = activityPostRepository.findById(requestDTO.getActivityPostId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_ACTIVITY_POST));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
         if (activityPost.getActivity().getInstitution() == null || !Objects.equals(activityPost.getActivity().getInstitution().getId(), loggedInInstitution.getId())) {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_INSTITUTION_MISMATCH);
@@ -62,7 +62,7 @@ public class UserReviewService {
     public List<UserReviewResponseDTO> getUserReviews(Long userId) {
         getLoggedInInstitution(); //기관만 접근 가능.
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException(ErrorCode.NOT_FOUND_USER);
+            throw new NotFoundException(ErrorCode.NOTFOUND_USER);
         }
         return userReviewRepository.findByUserId(userId).stream()
                 .map(UserReviewResponseDTO::toDTO)
@@ -73,7 +73,7 @@ public class UserReviewService {
     public void deleteUserReview(Long reviewId) {
         Institution loggedInInstitution = getLoggedInInstitution();
         UserReview userReview = userReviewRepository.findById(reviewId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_REVIEW));
 
         if (!Objects.equals(userReview.getWriteInst(), loggedInInstitution.getId())) {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_NO_PERMISSION);
@@ -84,6 +84,6 @@ public class UserReviewService {
     private Institution getLoggedInInstitution() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return institutionRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_INSTITUTION));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
     }
 }

@@ -8,7 +8,7 @@ INSERT INTO institution (id, name, email, password, phone_number, detail) VALUES
 
 -- User
 INSERT INTO user (id, name, email, password, phone_number, total_hour, birthdate, is_kakao, preferred_region) VALUES
-(1, '김봉사', 'kim@ddabong.com', '1234', '010-3333-3333', 10, '1990-01-01', false, '서울'),
+(1, '김봉사', 'test@test', '$2a$10$YlakYH21qBT7qymZ4bJH7e7RUkERACdgBYSbQcU', '010-3333-3333', 10, '1990-01-01', false, '서울'),
 (2, '이봉사', 'lee@ddabong.com', '1234', '010-4444-4444', 20, '1995-05-05', true, '경기'),
 (3, '박봉사', 'park@ddabong.com', '1234', '010-8888-8888', 5, '2000-02-10', false, '인천'),
 (4, '최봉사', 'choi@ddabong.com', '1234', '010-9999-9999', 30, '1988-11-20', true, '부산'),
