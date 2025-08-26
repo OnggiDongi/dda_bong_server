@@ -96,7 +96,9 @@ public class UserService {
 
 
     private UserResponseDTO toDTO(User user) {
-        return UserResponseDTO.builder()
+		String grade = user.getTotalHour() < 111 ? "SILVER" : "VIP";
+
+		return UserResponseDTO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
@@ -108,6 +110,7 @@ public class UserService {
                 .preferredCategory(user.getPreferredCategory().stream()
                         .map(Enum::name)
                         .collect(Collectors.toList()))
+				.grade(grade)
                 .build();
     }
 
