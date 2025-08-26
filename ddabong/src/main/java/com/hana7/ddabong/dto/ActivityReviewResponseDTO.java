@@ -16,4 +16,5 @@ public class ActivityReviewResponseDTO {
 	private int rate;
 
 	private String comment;
+
 }
