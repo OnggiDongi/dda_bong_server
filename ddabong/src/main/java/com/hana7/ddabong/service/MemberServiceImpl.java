@@ -3,6 +3,8 @@ package com.hana7.ddabong.service;
 import com.hana7.ddabong.dto.MemberDTO;
 import com.hana7.ddabong.entity.Institution;
 import com.hana7.ddabong.entity.User;
+import com.hana7.ddabong.enums.ErrorCode;
+import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.repository.InstitutionRepository;
 import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +25,15 @@ public class MemberServiceImpl  implements UserDetailsService {
 		User user = userRepository.findByEmail(username).orElse(null);
 		Institution institution = institutionRepository.findByEmail(username).orElse(null);
 
-		if(user == null && institution == null) {
-			throw new UsernameNotFoundException(username);
-		} else if(user == null) {
-			return new MemberDTO(institution.getEmail(), institution.getPassword(), institution.getName());
-		} else{
+		if(user == null) {
+			if(institution == null){
+				throw new UsernameNotFoundException(username);
+			} else if(institution.getDeletedAt() == null){
+				return new MemberDTO(institution.getEmail(), institution.getPassword(), institution.getName());
+			}
+		} else {
 			return new MemberDTO(user.getEmail(), user.getPassword(), user.getName());
 		}
+		return null;
 	}
 }

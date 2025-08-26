@@ -59,4 +59,12 @@ public class SwaggerConfig {
 				.pathsToMatch("/institutions/**")
 				.build();
 	}
+
+	@Bean
+	public GroupedOpenApi certificationApi() {
+		return GroupedOpenApi.builder()
+			.group("certifications")
+			.pathsToMatch("/certifications/**")
+			.build();
+	}
 }
