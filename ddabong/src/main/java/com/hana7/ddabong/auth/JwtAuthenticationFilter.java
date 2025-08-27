@@ -57,7 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			String email = (String)claims.get("email");
 			String name = (String)claims.get("name");
-			MemberDTO dto = new MemberDTO(email, "", name);
+			String role = (String)claims.get("role");
+			MemberDTO dto = new MemberDTO(email, "", name, role);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 					UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
