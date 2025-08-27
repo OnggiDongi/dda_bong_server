@@ -14,6 +14,7 @@ import com.hana7.ddabong.repository.ActivityReviewRepository;
 import com.hana7.ddabong.repository.ApplicantRepository;
 import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.view.RedirectView;
@@ -81,5 +82,25 @@ public class ActivityReviewService {
         return activityReviewRepository.findByActivity_Id(activityId).stream()
                 .map(review -> ActivityMyReviewResponseDTO.toDTO(review, review.getActivity().getCategory().getDescription()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteActivityReview(String email, Long activityReviewId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+        ActivityReview activityReview = activityReviewRepository.findById(activityReviewId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_REVIEW));
+
+        if(activityReview.getDeletedAt() != null){
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_ALREADY_DELETED);
+        }
+
+        if(!activityReview.getUser().getId().equals(user.getId())){
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_NO_PERMISSION);
+        }
+
+        activityReview.markDeleted();
+        activityReviewRepository.save(activityReview);
     }
 }
