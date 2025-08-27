@@ -11,25 +11,25 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{userId}/reviews")
+@RequestMapping("/users")
 public class UserReviewController {
 
     private final UserReviewService userReviewService;
 
-    @PostMapping
+    @PostMapping("/{userId}/reviews")
     public ResponseEntity<Void> createUserReview(@PathVariable Long userId, @RequestBody UserReviewRequestDTO requestDTO) {
         userReviewService.createUserReview(userId, requestDTO);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
+    @GetMapping("/{userId}/reviews")
     public ResponseEntity<List<UserReviewResponseDTO>> getUserReviews(@PathVariable Long userId) {
         List<UserReviewResponseDTO> userReviews = userReviewService.getUserReviews(userId);
         return ResponseEntity.ok(userReviews);
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<Void> deleteUserReview(@PathVariable Long userId, @PathVariable Long reviewId) {
+    public ResponseEntity<Void> deleteUserReview(@PathVariable Long reviewId) {
         userReviewService.deleteUserReview(reviewId);
         return ResponseEntity.ok().build();
     }

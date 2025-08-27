@@ -1,7 +1,7 @@
 package com.hana7.ddabong.service;
 
+import com.hana7.ddabong.dto.ActivityMyReviewResponseDTO;
 import com.hana7.ddabong.dto.ActivityReviewRequestDTO;
-import com.hana7.ddabong.dto.ActivityReviewResponseDTO;
 import com.hana7.ddabong.entity.ActivityPost;
 import com.hana7.ddabong.entity.ActivityReview;
 import com.hana7.ddabong.entity.User;
@@ -14,8 +14,10 @@ import com.hana7.ddabong.repository.ActivityReviewRepository;
 import com.hana7.ddabong.repository.ApplicantRepository;
 import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,22 +65,42 @@ public class ActivityReviewService {
         activityReviewRepository.save(activityReview);
     }
 
-    public List<ActivityReviewResponseDTO> getMyActivityReviews(String email) {
+    public List<ActivityMyReviewResponseDTO> getMyActivityReviews(String email) {
         if (!userRepository.existsByEmail(email)) {
             throw new NotFoundException(ErrorCode.NOTFOUND_USER);
         }
         return activityReviewRepository.findByUser_Email(email).stream()
-                .map(ActivityReviewResponseDTO::toDTO)
+                .map(review -> ActivityMyReviewResponseDTO.toDTO(review, review.getActivity().getCategory().getDescription()))
                 .collect(Collectors.toList());
     }
 
-    public List<ActivityReviewResponseDTO> getActivityPostReviews(Long activityPostId) {
+    public List<ActivityMyReviewResponseDTO> getActivityPostReviews(Long activityPostId) {
         ActivityPost activityPost = activityPostRepository.findById(activityPostId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
         Long activityId = activityPost.getActivity().getId();
         return activityReviewRepository.findByActivity_Id(activityId).stream()
-                .map(ActivityReviewResponseDTO::toDTO)
+                .map(review -> ActivityMyReviewResponseDTO.toDTO(review, review.getActivity().getCategory().getDescription()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteActivityReview(String email, Long activityReviewId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+        ActivityReview activityReview = activityReviewRepository.findById(activityReviewId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_REVIEW));
+
+        if(activityReview.getDeletedAt() != null){
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_ALREADY_DELETED);
+        }
+
+        if(!activityReview.getUser().getId().equals(user.getId())){
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_NO_PERMISSION);
+        }
+
+        activityReview.markDeleted();
+        activityReviewRepository.save(activityReview);
     }
 }

@@ -57,9 +57,9 @@ public class CustomOAuthService implements OAuth2UserService<OAuth2UserRequest, 
 					.email(kakaoUserInfo.getEmail())
 					.password(attributes.get("id").toString())
 					.isKakao(true)
-					// TODO : 카카오 심사 끝나면 원래 정보들로 채워놓기 -> KakaoUserInfo 수정 후에 하기
-					.phoneNumber("010-0000-0000")
-					.birthdate(LocalDate.now())
+					.phoneNumber(kakaoUserInfo.getPhoneNumber())
+					.birthdate(kakaoUserInfo.getBirthDate())
+					.profileImage(kakaoUserInfo.getProfileImage())
 					.build();
 			userRepository.save(newUser);
 		}

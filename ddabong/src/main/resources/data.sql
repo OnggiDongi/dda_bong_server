@@ -25,40 +25,40 @@ INSERT INTO user_preferred_category (user_id, preferred_category) VALUES
 (5, 'PUBLIC'), (6, 'GLOBAL'), (7, 'LIVING'), (8, 'EDUCATION'), (9, 'SAFETY'), (10, 'CULTURE');
 
 -- Activity
-INSERT INTO activity (id, title, content, category, institution) VALUES
-(1, '독거노인 생활 지원', '독거노인 분들의 양치를 시켜드려요.', 'LIVING', 1),
-(2, '청소년 코딩 교육', '청소년들에게 코딩을 가르칩니다.', 'EDUCATION', 2),
-(3, '해변 정화 활동', '해변의 쓰레기를 줍습니다.', 'ENVIRONMENT', 3),
-(4, '어린이 안전 교육', '어린이들에게 안전 교육을 실시합니다.', 'SAFETY', 4),
-(5, '다문화 가정 지원', '다문화 가정을 지원합니다.', 'CULTURE', 5);
+INSERT INTO activity (title, content, category, institution) VALUES
+( '독거노인 생활 지원', '독거노인 분들의 양치를 시켜드려요.', 'LIVING', 1),
+( '청소년 코딩 교육', '청소년들에게 코딩을 가르칩니다.', 'EDUCATION', 2),
+( '해변 정화 활동', '해변의 쓰레기를 줍습니다.', 'ENVIRONMENT', 3),
+( '어린이 안전 교육', '어린이들에게 안전 교육을 실시합니다.', 'SAFETY', 4),
+( '다문화 가정 지원', '다문화 가정을 지원합니다.', 'CULTURE', 5);
 
 -- ActivityPost
-INSERT INTO activity_post (id, title, content, start_at, end_at, recruitment_start, recruitment_end, is_accept, capacity, location, image_url, activity_id) VALUES
-(1, '독거노인 방문 봉사', '독거노인 분들을 방문하여 악어새가 되어드립니다.', '2025-09-01 10:00:00', '2025-09-01 12:00:00', '2025-08-20 09:00:00', '2025-08-31 18:00:00', true, 10, '서울시 강남구', 'http://example.com/image1.jpg', 1),
-(2, '코딩 멘토링', '청소년들에게 코딩 멘토링을 제공합니다.', '2025-09-10 14:00:00', '2025-09-10 16:00:00', '2025-08-25 09:00:00', '2025-09-05 18:00:00', true, 5, '경기도 성남시', 'http://example.com/image2.jpg', 2),
-(3, '제주 해변 플로깅', '제주 해변에서 플로깅을 진행합니다.', '2025-09-15 09:00:00', '2025-09-15 11:00:00', '2025-09-01 09:00:00', '2025-09-10 18:00:00', true, 20, '제주시 한림읍', 'http://example.com/image3.jpg', 3),
-(4, '초등학교 교통 안전 캠페인', '초등학생들의 등하굣길 교통 안전을 위한 캠페인을 진행합니다.', '2025-09-20 08:00:00', '2025-09-20 10:00:00', '2025-09-05 09:00:00', '2025-09-15 18:00:00', true, 15, '부산시 해운대구', 'http://example.com/image4.jpg', 4),
-(5, '외국인 주민 한국 문화 체험', '외국인 주민들에게 한국 문화를 소개하고 함께 체험합니다.', '2025-09-25 13:00:00', '2025-09-25 16:00:00', '2025-09-10 09:00:00', '2025-09-20 18:00:00', true, 12, '서울시 용산구', 'http://example.com/image5.jpg', 5);
+INSERT INTO activity_post (title, content, start_at, end_at, recruitment_start, recruitment_end, is_accept, capacity, location, image_url, activity_id) VALUES
+( '독거노인 방문 봉사', '독거노인 분들을 방문하여 악어새가 되어드립니다.', '2025-09-01 10:00:00', '2025-09-01 12:00:00', '2025-08-20 09:00:00', '2025-08-31 18:00:00', true, 10, '서울시 강남구', 'http://example.com/image1.jpg', 1),
+( '코딩 멘토링', '청소년들에게 코딩 멘토링을 제공합니다.', '2025-09-10 14:00:00', '2025-09-10 16:00:00', '2025-08-25 09:00:00', '2025-09-05 18:00:00', true, 5, '경기도 성남시', 'http://example.com/image2.jpg', 2),
+( '제주 해변 플로깅', '제주 해변에서 플로깅을 진행합니다.', '2025-09-15 09:00:00', '2025-09-15 11:00:00', '2025-09-01 09:00:00', '2025-09-10 18:00:00', true, 20, '제주시 한림읍', 'http://example.com/image3.jpg', 3),
+( '초등학교 교통 안전 캠페인', '초등학생들의 등하굣길 교통 안전을 위한 캠페인을 진행합니다.', '2025-09-20 08:00:00', '2025-09-20 10:00:00', '2025-09-05 09:00:00', '2025-09-15 18:00:00', true, 15, '부산시 해운대구', 'http://example.com/image4.jpg', 4),
+( '외국인 주민 한국 문화 체험', '외국인 주민들에게 한국 문화를 소개하고 함께 체험합니다.', '2025-09-25 13:00:00', '2025-09-25 16:00:00', '2025-09-10 09:00:00', '2025-09-20 18:00:00', true, 12, '서울시 용산구', 'http://example.com/image5.jpg', 5);
 
 -- Applicant
-INSERT INTO applicant (id, hours, status, user_id, activity_post_id) VALUES
-(1, 2.00, 'APPROVED', 1, 1), (2, 2.00, 'PENDING', 2, 1), (3, 2.00, 'APPROVED', 2, 2),
-(4, 2.00, 'APPROVED', 3, 3), (5, 2.00, 'REJECTED', 4, 3), (6, 2.00, 'APPROVED', 5, 4),
-(7, 3.00, 'PENDING', 6, 5), (8, 3.00, 'APPROVED', 7, 5), (9, 2.00, 'APPROVED', 8, 1),
-(10, 2.00, 'PENDING', 9, 2), (11, 2.00, 'APPROVED', 10, 3);
+INSERT INTO applicant ( hours, status, user_id, activity_post_id) VALUES
+( 2.00, 'APPROVED', 1, 1), ( 2.00, 'PENDING', 2, 1), ( 2.00, 'APPROVED', 2, 2),
+( 2.00, 'APPROVED', 3, 3), ( 2.00, 'REJECTED', 4, 3), ( 2.00, 'APPROVED', 5, 4),
+( 3.00, 'PENDING', 6, 5), ( 3.00, 'APPROVED', 7, 5), ( 2.00, 'APPROVED', 8, 1),
+(2.00, 'PENDING', 9, 2), (2.00, 'APPROVED', 10, 3);
 
 -- Likes
-INSERT INTO likes (id, user_id, activity_post_id) VALUES
-(1, 1, 2), (2, 2, 1), (3, 3, 4), (4, 4, 5), (5, 5, 3),
-(6, 6, 1), (7, 7, 2), (8, 8, 5), (9, 9, 4), (10, 10, 1);
+INSERT INTO likes ( user_id, activity_post_id) VALUES
+( 1, 2), ( 2, 1), ( 3, 4), ( 4, 5), ( 5, 3),
+( 6, 1), ( 7, 2), ( 8, 5), ( 9, 4), ( 10, 1);
 
 -- ActivityReview
-INSERT INTO activity_review (id, rate, content, image_url, activity_id, user_id) VALUES
-(1, 5, '정말 보람있는 시간이었습니다.', 'http://example.com/review1.jpg', 1, 1),
-(2, 4, '아이들이 똑똑해서 가르치는 재미가 있었어요.', 'http://example.com/review2.jpg', 2, 2),
-(3, 5, '제주 바다가 깨끗해져서 뿌듯합니다.', 'http://example.com/review3.jpg', 3, 3),
-(4, 4, '아이들이 즐거워하는 모습을 보니 좋았습니다.', 'http://example.com/review4.jpg', 4, 5),
-(5, 5, '다양한 나라의 친구들을 만날 수 있어서 유익했습니다.', 'http://example.com/review5.jpg', 5, 7);
+INSERT INTO activity_review ( rate, content, image_url, activity_id, user_id) VALUES
+( 5, '정말 보람있는 시간이었습니다.', 'http://example.com/review1.jpg', 1, 1),
+( 4, '아이들이 똑똑해서 가르치는 재미가 있었어요.', 'http://example.com/review2.jpg', 2, 2),
+( 5, '제주 바다가 깨끗해져서 뿌듯합니다.', 'http://example.com/review3.jpg', 3, 3),
+( 4, '아이들이 즐거워하는 모습을 보니 좋았습니다.', 'http://example.com/review4.jpg', 4, 5),
+( 5, '다양한 나라의 친구들을 만날 수 있어서 유익했습니다.', 'http://example.com/review5.jpg', 5, 7);
 
 -- UserReview
 INSERT INTO user_review (id, health_status, diligence_level, attitude, memo, user_id, write_inst, activity_post_id) VALUES
@@ -74,14 +74,14 @@ INSERT INTO user_review (id, health_status, diligence_level, attitude, memo, use
 (10, 4, 4, 5, '긍정적인 에너지가 넘칩니다.', 10,4, 1);
 
 -- Certification
-INSERT INTO certification (id, hour, user_id) VALUES
-(1, 10, 1), (2, 20, 2), (3, 5, 3), (4, 30, 4), (5, 15, 5),
-(6, 25, 6), (7, 8, 7), (8, 12, 8), (9, 18, 9), (10, 22, 10);
+INSERT INTO certification ( hour, user_id) VALUES
+( 10, 1), ( 20, 2), ( 5, 3), ( 30, 4), ( 15, 5),
+( 25, 6), ( 8, 7), ( 12, 8), ( 18, 9), (22, 10);
 
 -- SupportRequest
-INSERT INTO support_request (id, supply, detail, status, activity_post_id) VALUES
-(1, '간식', '어르신들께 드릴 간식이 필요합니다.', 'APPROVED', 1),
-(2, '노트북', '교육용 노트북이 부족합니다.', 'PENDING', 2),
-(3, '쓰레기 봉투', '해변 정화 활동에 사용할 대용량 쓰레기 봉투가 필요합니다.', 'APPROVED', 3),
-(4, '안전 조끼', '아이들의 눈에 잘 띄는 안전 조끼가 필요합니다.', 'REJECTED', 4),
-(5, '한복', '외국인 주민들이 입어볼 한복이 필요합니다.', 'PENDING', 5);
+INSERT INTO support_request ( supply, detail, status, activity_post_id) VALUES
+( '간식', '어르신들께 드릴 간식이 필요합니다.', 'APPROVED', 1),
+( '노트북', '교육용 노트북이 부족합니다.', 'PENDING', 2),
+( '쓰레기 봉투', '해변 정화 활동에 사용할 대용량 쓰레기 봉투가 필요합니다.', 'APPROVED', 3),
+( '안전 조끼', '아이들의 눈에 잘 띄는 안전 조끼가 필요합니다.', 'REJECTED', 4),
+( '한복', '외국인 주민들이 입어볼 한복이 필요합니다.', 'PENDING', 5);
