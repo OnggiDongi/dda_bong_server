@@ -40,6 +40,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // S3 관련
+    implementation 'software.amazon.awssdk:s3:2.25.39'
+
     // Annotation 관련
     implementation 'com.querydsl:querydsl-jpa::jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
