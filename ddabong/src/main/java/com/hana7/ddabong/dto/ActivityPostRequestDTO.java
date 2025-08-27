@@ -23,24 +23,17 @@ public class ActivityPostRequestDTO {
     @NotBlank(message = "내용은 필수 값입니다.")
     private String content;
 
-    @NotNull(message = "봉사활동은 필수 값입니다.")
-    private Activity activity;
+    @NotNull(message = "봉사활동ID은 필수 값입니다.")
+    private Long activityId;
 
-    @NotNull(message = "활동 시작일시는 필수 값입니다.")
-    @Future(message = "활동 시작일시는 현재 시간 이후여야 합니다.")
-    private LocalDateTime startAt;
+    @NotBlank(message = "활동 시작일시는 필수 값입니다. (yyyy-MM-dd HH:mm)")
+    private String startAt;
 
-    @NotNull(message = "활동 종료일시는 필수 값입니다.")
-    @Future(message = "활동 종료일시는 현재 시간 이후여야 합니다.")
-    private LocalDateTime endAt;
+    @NotBlank(message = "총 활동 시간은 필수 값입니다. (HH:mm)")
+    private String activityTime;
 
-    @NotNull(message = "모집 시작일시는 필수 값입니다.")
-    @Future(message = "모집 시작일시는 현재 시간 이후여야 합니다.")
-    private LocalDateTime recruitmentStart;
-
-    @NotNull(message = "모집 종료일시는 필수 값입니다.")
-    @Future(message = "모집 종료일시는 현재 시간 이후여야 합니다.")
-    private LocalDateTime recruitmentEnd;
+    @NotBlank(message = "모집 종료일시는 필수 값입니다. (yyyy-MM-dd HH:mm)")
+    private String recruitmentEnd;
 
     @NotBlank(message = "활동 장소는 필수 값입니다.")
     @Size(max = 128, message = "장소는 최대 128자까지 가능합니다.")
@@ -51,13 +44,18 @@ public class ActivityPostRequestDTO {
 
     private MultipartFile image;
 
-    public ActivityPost toEntity(String fileUrl) {
+    public ActivityPost toEntity(
+            String fileUrl,
+            LocalDateTime startAt,
+            LocalDateTime endAt,
+            LocalDateTime recruitmentEnd,
+            Activity activity
+    ) {
         return ActivityPost.builder()
                 .title(title)
                 .content(content)
                 .startAt(startAt)
                 .endAt(endAt)
-                .recruitmentStart(recruitmentStart)
                 .recruitmentEnd(recruitmentEnd)
                 .capacity(capacity)
                 .location(location)
