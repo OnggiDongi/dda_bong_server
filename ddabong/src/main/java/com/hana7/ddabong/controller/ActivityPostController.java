@@ -6,6 +6,7 @@ import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.ActivityPostService;
+import com.hana7.ddabong.service.LikesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ActivityPostController {
 	private final ActivityPostService activityPostService;
+	private final LikesService likesService;
 
 	@Tag(name = "봉사 모집글 상세보기")
 	@Operation(summary = "기관이 작성한 봉사 모집글에 대한 상세정보를 확인할 수 있다.")
@@ -33,9 +35,9 @@ public class ActivityPostController {
 					description = "해당하는 봉사 모집글이 존재하지 않습니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
 	})
-	@GetMapping("/{id}")
-	public ResponseEntity<ActivityPostDetailResponseDTO> getActivityPost(@PathVariable Long id) {
-		ActivityPostDetailResponseDTO dto = activityPostService.getPost(id);
+	@GetMapping("/{activityPostId}")
+	public ResponseEntity<ActivityPostDetailResponseDTO> getActivityPost(@PathVariable Long activityPostId) {
+		ActivityPostDetailResponseDTO dto = activityPostService.getPost(activityPostId);
 		return ResponseEntity.ok(dto);
 	}
 
@@ -93,5 +95,19 @@ public class ActivityPostController {
 	public ResponseEntity<List<ActivityPostResponseDTO>> getActivityPost(Authentication authentication) {
 		List<ActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName());
 		return ResponseEntity.ok(getMyActivityPosts);
+	}
+
+	@Tag(name = "봉사 모집글 찜하기 & 취소하기")
+	@Operation(summary = "회원은 봉사 모집글을 찜하거나 찜한 것을 취소할 수 있다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "봉사 모집글 찜하기에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404",
+					description = "해당하는 기관 | 회원이 존재하지 않습니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
+	})
+	@PostMapping("/{activityPostId}/like")
+	public ResponseEntity<?> likeActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
+		likesService.likeActivityPost(authentication.getName(), activityPostId);
+		return ResponseEntity.ok().build();
 	}
 }
