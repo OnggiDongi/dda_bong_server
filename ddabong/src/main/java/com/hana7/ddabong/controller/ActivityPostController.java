@@ -1,23 +1,28 @@
 package com.hana7.ddabong.controller;
 
 import com.hana7.ddabong.dto.ActivityPostDetailResponseDTO;
+import com.hana7.ddabong.dto.ActivityPostRequestDTO;
 import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.exception.BadRequestException;
-import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.ActivityPostService;
 import com.hana7.ddabong.service.LikesService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -26,6 +31,25 @@ import java.util.List;
 public class ActivityPostController {
 	private final ActivityPostService activityPostService;
 	private final LikesService likesService;
+
+	@Tag(name = "봉사활동 게시물 API")
+	@Operation(summary = "게시물 등록")
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> createActivityPost(
+			@Valid
+			ActivityPostRequestDTO dto,
+			Authentication authentication
+	) throws IOException {
+		activityPostService.createActivityPost(dto, authentication.getName());
+		return ResponseEntity.ok().build();
+	}
+
+	@Tag(name = "봉사활동 게시물 API")
+	@Operation(summary = "게시물 수정")
+	@PatchMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateActivityPost() {
+		return ResponseEntity.ok().build();
+	}
 
 	@Tag(name = "봉사 모집글 상세보기")
 	@Operation(summary = "기관이 작성한 봉사 모집글에 대한 상세정보를 확인할 수 있다.")
