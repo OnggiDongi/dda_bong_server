@@ -1,5 +1,6 @@
 package com.hana7.ddabong.controller;
 
+import com.hana7.ddabong.dto.ActivityMyReviewResponseDTO;
 import com.hana7.ddabong.dto.ActivityReviewRequestDTO;
 import com.hana7.ddabong.dto.ActivityReviewResponseDTO;
 import com.hana7.ddabong.service.ActivityReviewService;
@@ -18,9 +19,9 @@ public class ActivityReviewController {
     private final ActivityReviewService activityReviewService;
 
     @GetMapping("/myreview")
-    public ResponseEntity<List<ActivityReviewResponseDTO>> getMyActivityReviews(Authentication authentication) {
+    public ResponseEntity<List<ActivityMyReviewResponseDTO>> getMyActivityReviews(Authentication authentication) {
         String email = authentication.getName();
-        List<ActivityReviewResponseDTO> activityReviews = activityReviewService.getMyActivityReviews(email);
+        List<ActivityMyReviewResponseDTO> activityReviews = activityReviewService.getMyActivityReviews(email);
         return ResponseEntity.ok(activityReviews);
     }
 
@@ -32,8 +33,8 @@ public class ActivityReviewController {
     }
 
     @GetMapping("/{activityPostId}/review")
-    public ResponseEntity<List<ActivityReviewResponseDTO>> getActivityPostReviews(@PathVariable Long activityPostId) {
-        List<ActivityReviewResponseDTO> activityReviews = activityReviewService.getActivityPostReviews(activityPostId);
+    public ResponseEntity<List<ActivityMyReviewResponseDTO>> getActivityPostReviews(@PathVariable Long activityPostId) {
+        List<ActivityMyReviewResponseDTO> activityReviews = activityReviewService.getActivityPostReviews(activityPostId);
         return ResponseEntity.ok(activityReviews);
     }
 }
