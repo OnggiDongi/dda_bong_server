@@ -44,34 +44,34 @@ public class SwaggerConfig {
 				.description("DDABONG Project API Documents");
 	}
 
-	@Bean
-	public GroupedOpenApi usersApi() {
-		return GroupedOpenApi.builder()
-				.group("users")                 // UI에서 보일 그룹명
-				.pathsToMatch("/users/**")      // 이 경로 하위만 포함
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi institutionsApi() {
-		return GroupedOpenApi.builder()
-				.group("institutions")
-				.pathsToMatch("/institutions/**")
-				.build();
-	}
-
-	@Bean
-	public GroupedOpenApi certificationApi() {
-		return GroupedOpenApi.builder()
-			.group("certifications")
-			.pathsToMatch("/certifications/**")
-			.build();
-	}
-	@Bean
-	public GroupedOpenApi activityApi() {
-		return GroupedOpenApi.builder()
-			.group("activity")
-			.pathsToMatch("/activity/**")
-			.build();
-	}
+//	@Bean
+//	public GroupedOpenApi usersApi() {
+//		return GroupedOpenApi.builder()
+//				.group("users")                 // UI에서 보일 그룹명
+//				.pathsToMatch("/users/**")      // 이 경로 하위만 포함
+//				.build();
+//	}
+//
+//	@Bean
+//	public GroupedOpenApi institutionsApi() {
+//		return GroupedOpenApi.builder()
+//				.group("institutions")
+//				.pathsToMatch("/institutions/**")
+//				.build();
+//	}
+//
+//	@Bean
+//	public GroupedOpenApi certificationApi() {
+//		return GroupedOpenApi.builder()
+//			.group("certifications")
+//			.pathsToMatch("/certifications/**")
+//			.build();
+//	}
+//	@Bean
+//	public GroupedOpenApi activityApi() {
+//		return GroupedOpenApi.builder()
+//			.group("activity")
+//			.pathsToMatch("/activity/**")
+//			.build();
+//	}
 }

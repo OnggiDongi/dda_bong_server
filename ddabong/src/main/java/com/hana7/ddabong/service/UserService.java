@@ -39,14 +39,14 @@ public class UserService {
 
     public UserResponseDTO findUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
         return toDTO(user);
     }
 
     @Transactional
-    public UserResponseDTO updateOnboardingInfo(Long id, UserOnboardingRequestDTO userOnboardingRequestDTO) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Id : " + id + "인 회원이 없습니다"));
+    public UserResponseDTO updateOnboardingInfo(String email, UserOnboardingRequestDTO userOnboardingRequestDTO) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         user = user.toBuilder()
                 .preferredRegion(userOnboardingRequestDTO.getPreferredRegion())
@@ -61,7 +61,7 @@ public class UserService {
     @Transactional
     public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("Email : " + email + "인 회원이 없습니다"));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
 		String encodedPassword = passwordEncoder.encode(userUpdateRequestDTO.getPassword());
 
@@ -76,18 +76,20 @@ public class UserService {
         return toDTO(updatedUser);
     }
 
-    public List<ActivityPostResponseDTO> findLikedActivities(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Id : " + userId + "인 회원이 없습니다"));
-        List<Likes> likes = likesRepository.findByUser(user);
+    public List<ActivityPostResponseDTO> findLikedActivities(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+        List<Likes> likes = likesRepository.findByUserAndDeletedAtIsNull(user);
+
         return likes.stream()
                 .map(like -> ActivityPostResponseDTO.of(like.getActivityPost()))
                 .collect(Collectors.toList());
     }
 
-    public List<ActivityPostResponseDTO> findActivityHistory(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Id : " + userId + "인 회원이 없습니다"));
+    public List<ActivityPostResponseDTO> findActivityHistory(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
         List<Applicant> applicants = applicantRepository.findByUser(user);
         return applicants.stream()
                 .map(applicant -> ActivityPostResponseDTO.of(applicant.getActivityPost()))
@@ -113,8 +115,6 @@ public class UserService {
 				.grade(grade)
                 .build();
     }
-
-
 
 	public void signup(UserRequestDTO userRequestDTO) {
 		// 같은 아이디 있는지 확인하기

@@ -54,7 +54,7 @@ public class ActivityPost extends BaseEntity {
 	private LocalDateTime endAt;
 
 	@Comment("모집 시작일시")
-	@Column(name = "recruitment_start", nullable = false)
+	@Column(name = "recruitment_start")
 	private LocalDateTime recruitmentStart;
 
 	@Comment("모집 종료일시")

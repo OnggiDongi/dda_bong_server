@@ -40,9 +40,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
-    @PostMapping("/{id}/onboarding")
-    public ResponseEntity<UserResponseDTO> updateUserOnboardingInfo(@PathVariable Long id, @RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO) {
-        return ResponseEntity.ok(userService.updateOnboardingInfo(id, userOnboardingRequestDTO));
+    @PostMapping("/onboarding")
+    public ResponseEntity<UserResponseDTO> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {
+        return ResponseEntity.ok(userService.updateOnboardingInfo(authentication.getName(), userOnboardingRequestDTO));
     }
 
     @PatchMapping("/update")
@@ -51,14 +51,14 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(email, userUpdateRequestDTO));
     }
 
-    @GetMapping("/{id}/likes")
-    public ResponseEntity<List<ActivityPostResponseDTO>> getLikedActivities(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findLikedActivities(id));
+    @GetMapping("/likes")
+    public ResponseEntity<List<ActivityPostResponseDTO>> getLikedActivities(Authentication authentication) {
+        return ResponseEntity.ok(userService.findLikedActivities(authentication.getName()));
     }
 
-    @GetMapping("/{id}/history")
-    public ResponseEntity<List<ActivityPostResponseDTO>> getActivityHistory(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findActivityHistory(id));
+    @GetMapping("/history")
+    public ResponseEntity<List<ActivityPostResponseDTO>> getActivityHistory(Authentication authentication) {
+        return ResponseEntity.ok(userService.findActivityHistory(authentication.getName()));
     }
 
 	@Tag(name = "회원가입 - 일반회원")
