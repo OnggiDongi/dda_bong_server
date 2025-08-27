@@ -44,8 +44,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateOnboardingInfo(Long id, UserOnboardingRequestDTO userOnboardingRequestDTO) {
-        User user = userRepository.findById(id)
+    public UserResponseDTO updateOnboardingInfo(String email, UserOnboardingRequestDTO userOnboardingRequestDTO) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         user = user.toBuilder()
@@ -76,17 +76,19 @@ public class UserService {
         return toDTO(updatedUser);
     }
 
-    public List<ActivityPostResponseDTO> findLikedActivities(Long userId) {
-        User user = userRepository.findById(userId)
+    public List<ActivityPostResponseDTO> findLikedActivities(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
-        List<Likes> likes = likesRepository.findByUser(user);
+
+        List<Likes> likes = likesRepository.findByUserAndDeletedAtIsNull(user);
+
         return likes.stream()
                 .map(like -> ActivityPostResponseDTO.of(like.getActivityPost()))
                 .collect(Collectors.toList());
     }
 
-    public List<ActivityPostResponseDTO> findActivityHistory(Long userId) {
-        User user = userRepository.findById(userId)
+    public List<ActivityPostResponseDTO> findActivityHistory(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
         List<Applicant> applicants = applicantRepository.findByUser(user);
         return applicants.stream()
