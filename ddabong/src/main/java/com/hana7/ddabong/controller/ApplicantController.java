@@ -1,5 +1,6 @@
 package com.hana7.ddabong.controller;
 
+import com.hana7.ddabong.dto.ApplicantDetailResponseDTO;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
@@ -13,11 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,4 +40,13 @@ public class ApplicantController {
 		applicantService.rejectApplicant(authentication.getName(), applicantId);
 		return ResponseEntity.ok().build();
 	}
+
+//	@PreAuthorize("hasAnyRole('ROLE_INSTITUTION')")
+	@GetMapping("/{userId}")
+	public ResponseEntity<?> getApplicantInfo(@PathVariable Long userId) {
+		ApplicantDetailResponseDTO applicantInfo = applicantService.getApplicantInfo(userId);
+		return ResponseEntity.ok(applicantInfo);
+	}
+
+
 }
