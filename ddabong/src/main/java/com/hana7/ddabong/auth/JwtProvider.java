@@ -2,6 +2,7 @@ package com.hana7.ddabong.auth;
 
 import com.hana7.ddabong.dto.MemberDTO;
 import com.hana7.ddabong.dto.OauthUserDTO;
+import com.hana7.ddabong.enums.ROLE;
 import com.hana7.ddabong.exception.CustomJwtException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -42,7 +43,7 @@ public class JwtProvider {
 		Map<String, Object> claims =  new HashMap<>();
 
 		if (authentication.getPrincipal() instanceof MemberDTO d) { // 일반 로그인
-			dto = new MemberDTO(d.getEmail(), "", d.getName());
+			dto = new MemberDTO(d.getEmail(), "", d.getName(), d.getRole());
 		} else { // 카카오 로그인
 			DefaultOAuth2User d = (DefaultOAuth2User) authentication.getPrincipal();
 
@@ -52,7 +53,7 @@ public class JwtProvider {
 			Map<String, Object> kakao_account = (Map<String, Object>) d.getAttributes().get("kakao_account");
 			String email = kakao_account.get("email").toString();
 
-			dto = new MemberDTO(email, "", name);
+			dto = new MemberDTO(email, "", name, ROLE.ROLE_USER.name());
 		}
 		claims = dto.getClaims();
 
