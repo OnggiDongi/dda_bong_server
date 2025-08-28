@@ -4,6 +4,7 @@ import com.hana7.ddabong.auth.JwtAuthenticationFilter;
 import com.hana7.ddabong.handler.CustomAccessDeniedHandler;
 import com.hana7.ddabong.handler.LoginFailureHandler;
 import com.hana7.ddabong.handler.LoginSuccessHandler;
+import com.hana7.ddabong.handler.OauthLoginSuccessHandler;
 import com.hana7.ddabong.service.CustomOAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,6 +38,7 @@ public class SecurityConfig {
 
 	private final LoginSuccessHandler loginSuccessHandler;
 	private final LoginFailureHandler loginFailureHandler;
+	private final OauthLoginSuccessHandler oauthLoginSuccessHandler;
 	private final CustomOAuthService customOAuthService;
 
 	@Bean
@@ -53,13 +55,17 @@ public class SecurityConfig {
 				)
 				// Oauth설정
 				.oauth2Login(customConfigurer -> customConfigurer
-						.successHandler(loginSuccessHandler)
+						.successHandler(oauthLoginSuccessHandler)
 						.failureHandler(loginFailureHandler)
 						.userInfoEndpoint(endpointConfig -> endpointConfig.userService(customOAuthService))
 				)
 				.exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()))
 				.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
+		http.authorizeHttpRequests(auth -> auth
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				.anyRequest().authenticated()
+		);
 		return http.build();
 	}
 
@@ -75,7 +81,8 @@ public class SecurityConfig {
 
 	private CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOriginPatterns(List.of("*"));
+//		config.setAllowedOrigins(List.of("http://localhost:3000")); // 정확한 origin 명시
+		config.setAllowedOriginPatterns(List.of("http://localhost:3000"));
 		config.setAllowedMethods(List.of(
 				HttpMethod.GET.name(),
 				HttpMethod.POST.name(),

@@ -50,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 									@NonNull FilterChain filterChain) throws ServletException, IOException {
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+		System.out.println("authHeader: " + authHeader);
 		try {
 			System.out.println();
 			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
