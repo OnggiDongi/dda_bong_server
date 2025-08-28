@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			"/swagger-ui/**",
 			"/v3/api-docs/**",
 			"/upload/**",
-			"/kakao/login"
+			"/kakao/login",
+			"/auth/refresh"
 	};
 
 	@Override
@@ -49,6 +50,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 									@NonNull FilterChain filterChain) throws ServletException, IOException {
+		String uri = request.getRequestURI();
+
+		// ✅ refresh 요청은 accessToken 없이 통과시켜야 함
+		if (uri.equals("/auth/refresh")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		System.out.println("authHeader: " + authHeader);
 		try {

@@ -64,6 +64,7 @@ public class SecurityConfig {
 
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				.requestMatchers("/auth/refresh").permitAll()
 				.anyRequest().authenticated()
 		);
 		return http.build();

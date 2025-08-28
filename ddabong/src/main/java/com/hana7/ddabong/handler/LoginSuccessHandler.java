@@ -2,6 +2,7 @@ package com.hana7.ddabong.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana7.ddabong.auth.JwtProvider;
+import com.hana7.ddabong.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,10 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
+
+	private final RefreshTokenService refreshTokenService;
 
 
 	@Override
@@ -23,6 +27,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 										Authentication authentication) throws IOException {
 
 		Map<String, Object> body = JwtProvider.getClaims(authentication);
+		System.out.println("body.get(\"email\") = " + body.get("email").toString());
+		System.out.println("body.get(\"refreshToken\") = " + body.get("refreshToken").toString());
+		refreshTokenService.saveRefreshToken(body.get("email").toString(), body.get("refreshToken").toString(), 60 * 24); // 1일
+
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		response.setContentType("application/json; charset=UTF-8");

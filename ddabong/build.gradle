@@ -43,6 +43,10 @@ dependencies {
     // S3 관련
     implementation 'software.amazon.awssdk:s3:2.25.39'
 
+    // Redis 관련
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.apache.commons:commons-pool2' // 커넥션 풀용
+
     // Annotation 관련
     implementation 'com.querydsl:querydsl-jpa::jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"

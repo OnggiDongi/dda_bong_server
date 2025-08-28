@@ -12,6 +12,7 @@ public enum ErrorCode {
 	NOTFOUND_CERTIFICATION(106, "해당 인증서를 찾을 수 없습니다."),
 	NOTFOUND_ACTIVITY(107, "해당 아이디를 가진 봉사 활동을 찾을 수 없습니다."),
 	NOTFOUND_APPLICANT(108, "해당 회원은 해당 봉사를 신청하지 않았습니다."),
+	NOTFOUND_REFRESHTOKEN(109, "RefreshToken이 없습니다. 로그인을 먼저 해주세요."),
 
 	BAD_REQUEST_FUTURE_BIRTHDATE(201, "생년월일이 현재보다 미래일 수 없습니다."),
 	BAD_REQUEST_INSTITUTION_MISMATCH(202, "리뷰를 작성하려는 활동의 주최 기관이 아닙니다."),
@@ -24,6 +25,11 @@ public enum ErrorCode {
 	BAD_REQUEST_ACTIVITY_NOT_COMPLETED(209, "아직 완료되지 않은 활동입니다."),
 	BAD_REQUEST_STATUS_NOT_PENDING(210, "봉사 신청상태가 대기중이 아닙니다."),
 	BAD_REQUEST_ALREADY_DELETED(211, "이미 삭제되었습니다."),
+	BAD_REQUEST_ACCESSTOKEN_EXPIRED(212, "accessToken이 만료되었습니다."),
+	BAD_REQUEST_REFRESHTOKEN_EXPIRED(213, "refreshToken이 만료되었습니다."),
+	BAD_REQUEST_REFRESHTOKEN_NOTVALID(214, "refreshToken가 저장된 것과 다릅니다."),
+//	BAD_REQUEST_(213, "refreshToken이 만료되었습니다."),
+
 
 	CONFLICT_USER(301, "이미 존재하는 회원입니다."),
 	CONFLICT_INSTITUTION(302, "이미 존재하는 기관입니다."),
