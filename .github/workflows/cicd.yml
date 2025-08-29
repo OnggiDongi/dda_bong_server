@@ -1,0 +1,20 @@
+name: SpringDemo CI/CD
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5.0.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: set props
+        working-directory: dda_bong_server/ddabong
+        run: echo "${{ secrets.APPLICATION }}"
