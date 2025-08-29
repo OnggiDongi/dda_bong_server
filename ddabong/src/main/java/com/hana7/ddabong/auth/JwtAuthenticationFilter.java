@@ -37,8 +37,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			"/v3/api-docs/**",
 			"/upload/**",
 			"/kakao/login",
+			// 배포 서버용
 			"/api/v3/api-docs/**",
-			"/api/swagger-ui/**"
+			"/api/swagger-ui/**",
+			"/api/kakao/login",
+			"/api/login",
+			"/api/users/signin",
+			"/api/users/signup",
+			"/api/institutions/signup",
+			"/api/api/public/**",
+			"/api/favicon.ico",
+			"/api/actuator/**",
+			"/api/*.html",
 	};
 
 	@Override
