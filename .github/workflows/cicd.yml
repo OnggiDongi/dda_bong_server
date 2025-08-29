@@ -1,4 +1,4 @@
-name: SpringDemo CI/CD
+name: Ddabong CI/CD
 on:
   push:
     branches: [ develop ]
