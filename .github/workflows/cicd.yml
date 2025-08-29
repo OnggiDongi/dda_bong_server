@@ -16,15 +16,15 @@ jobs:
           java-version: '21'
 
       - name: set props
-        working-directory: dda_bong_server/ddabong
+        working-directory: ddabong
         run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
 
       - name: grant exe to gradlew
-        working-directory: dda_bong_server/ddabong
+        working-directory: ddabong
         run: chmod +x gradlew
 
       - name: build with gradle
-        working-directory: dda_bong_server/ddabong
+        working-directory: ddabong
         run: ./gradlew clean build -x test
 
       - name: setup ssh
@@ -37,7 +37,7 @@ jobs:
 
       - name: scp jar to was
         run: |
-          scp dda_bong_server/ddabong/build/libs/*.jar ec2-user@${{ secrets.WAS }}:/home/ec2-user/workspace/hana.jar
+          scp ddabong/build/libs/*.jar ec2-user@${{ secrets.WAS }}:/home/ec2-user/workspace/hana.jar
 
       - name: restart spring
         run: |
