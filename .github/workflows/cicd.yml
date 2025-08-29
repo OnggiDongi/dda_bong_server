@@ -15,15 +15,15 @@ jobs:
           java-version: '21'
 
       - name: set props
-        working-directory: dda_bong_server/ddabong
+#        working-directory: dda_bong_server/ddabong
         run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
 
       - name: grant exe to gradlew
-        working-directory: dda_bong_server/ddabong
+#        working-directory: dda_bong_server/ddabong
         run: chmod +x gradlew
 
       - name: build with gradle
-        working-directory: dda_bong_server/ddabong
+#        working-directory: dda_bong_server/ddabong
         run: ./gradlew clean build -x test
 
       - name: setup ssh
