@@ -1,11 +1,9 @@
 package com.hana7.ddabong.service;
 
-import com.hana7.ddabong.dto.ActivityPostDetailResponseDTO;
-import com.hana7.ddabong.dto.ActivityPostRequestDTO;
-import com.hana7.ddabong.dto.ActivityPostResponseDTO;
-import com.hana7.ddabong.dto.ActivityReviewResponseDTO;
+import com.hana7.ddabong.dto.*;
 import com.hana7.ddabong.entity.*;
 import com.hana7.ddabong.enums.ApprovalStatus;
+import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
@@ -14,7 +12,10 @@ import com.hana7.ddabong.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +25,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ActivityPostService {
 	private final ActivityPostRepository activityPostRepository;
 	private final ActivityRepository activityRepository;
@@ -39,6 +38,7 @@ public class ActivityPostService {
 	private final UserRepository userRepository;
 	private final InstitutionRepository institutionRepository;
 	private final ApplicantRepository applicantRepository;
+	private final ActivityPostCustomRepository activityPostCustomRepository;
 
 	private final S3Service s3Service;
 
@@ -69,6 +69,107 @@ public class ActivityPostService {
 		} catch (Exception e) {
 			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
 		}
+	}
+
+	public ResponseEntity<List<ActivityPostResponseDTO>> readActivityPostList(
+			int page, int pageSize, String searchRegion, String categories, String userEmail
+	) {
+		User user = userRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+		try {
+			List<Category> categoryList = (categories == null || categories.isBlank())
+					? null : Arrays.stream(categories.split(",")).map(Category::valueOf).toList();
+			PageRequest pageable = PageRequest.of(page -1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+			Page<ActivityPost> activityPosts = activityPostCustomRepository.findAllActivityPost(pageable, user.getPreferredRegion(), searchRegion, categoryList);
+			List<ActivityPostResponseDTO> body = activityPosts.stream()
+					.map(ActivityPostResponseDTO::fromEntity)
+					.toList();
+			return ResponseEntity.ok(body);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Transactional
+	public void updateActivityPost(Long id, ActivityPostRequestDTO dto, String userEmail) throws IOException {
+		ActivityPost post = activityPostRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+		Institution institution = institutionRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+		Activity activity = activityRepository.findById(dto.getActivityId())
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY));
+
+		if (!activity.getInstitution().getId().equals(institution.getId())) {
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
+		}
+
+		try {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+			LocalDateTime startAt = LocalDateTime.parse(dto.getStartAt(), formatter);
+			LocalDateTime recruitmentEnd = LocalDateTime.parse(dto.getRecruitmentEnd(), formatter);
+
+			String[] parts = dto.getActivityTime().split(":");
+			int hours = Integer.parseInt(parts[0]);
+			int minutes = Integer.parseInt(parts[1]);
+			LocalDateTime endAt = startAt.plusHours(hours).plusMinutes(minutes);
+
+			String fileUrl = (dto.getImage() != null && !dto.getImage().isEmpty())
+					? s3Service.uploadFile(dto.getImage())
+					: post.getImageUrl();
+
+			System.out.println(post);
+			post = post.toBuilder()
+					.activity(activity)
+					.title(dto.getTitle())
+					.content(dto.getContent())
+					.startAt(startAt)
+					.endAt(endAt)
+					.recruitmentEnd(recruitmentEnd)
+					.capacity(dto.getCapacity())
+					.location(dto.getLocation())
+					.imageUrl(fileUrl)
+					.build();
+
+			activityPostRepository.save(post);
+		} catch (Exception e) {
+			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
+		}
+	}
+
+	@Transactional
+	public void deleteActivityPost(Long id, String userEmail) {
+		Institution institution = institutionRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+		ActivityPost post = activityPostRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+		Activity activity = activityRepository.findById(post.getActivity().getId())
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY));
+
+		if (!activity.getInstitution().getId().equals(institution.getId())) {
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
+		}
+
+		post.markDeleted();
+		activityPostRepository.save(post);
+	}
+
+	@Transactional
+	public void closeActivityPost(Long id, String userEmail) {
+		Institution institution = institutionRepository.findByEmail(userEmail)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+		ActivityPost post = activityPostRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+		Activity activity = activityRepository.findById(post.getActivity().getId())
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY));
+
+		if (!activity.getInstitution().getId().equals(institution.getId())) {
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
+		}
+
+		post.setRecruitmentEnd(LocalDateTime.now());
+		activityPostRepository.save(post);
 	}
 
 	public ActivityPostDetailResponseDTO getPost(Long id) {
@@ -229,4 +330,6 @@ public class ActivityPostService {
 				.imageUrl(post.getImageUrl())
 				.build();
 	}
+
+
 }

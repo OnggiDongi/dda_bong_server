@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface UserReviewRepository extends JpaRepository<UserReview, Long> {
     List<UserReview> findByUserId(Long userId);
+
 }

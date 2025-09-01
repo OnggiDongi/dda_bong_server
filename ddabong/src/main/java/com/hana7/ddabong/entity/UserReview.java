@@ -19,6 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
@@ -38,7 +40,6 @@ public class UserReview extends BaseEntity{
 	@ColumnDefault("5")
 	private int diligenceLevel;
 
-
 	@Column(name = "attitude",nullable = false)
 	@ColumnDefault("3")
 	private int attitude;
@@ -48,6 +49,20 @@ public class UserReview extends BaseEntity{
 
 	@Column(name = "write_inst",nullable = false)
 	private Long writeInst;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "activity_post_id",
+			foreignKey = @ForeignKey(
+					name = "fk_UserReview_ActivityPost",
+					foreignKeyDefinition = """
+            foreign key (activity_post_id)
+            references activity_post(id)
+            on delete set null
+        """
+			)
+	)
+	private ActivityPost activityPost;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(

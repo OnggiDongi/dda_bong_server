@@ -25,11 +25,10 @@ public enum ErrorCode {
 	BAD_REQUEST_ACTIVITY_NOT_COMPLETED(209, "아직 완료되지 않은 활동입니다."),
 	BAD_REQUEST_STATUS_NOT_PENDING(210, "봉사 신청상태가 대기중이 아닙니다."),
 	BAD_REQUEST_ALREADY_DELETED(211, "이미 삭제되었습니다."),
-	BAD_REQUEST_ACCESSTOKEN_EXPIRED(212, "accessToken이 만료되었습니다."),
-	BAD_REQUEST_REFRESHTOKEN_EXPIRED(213, "refreshToken이 만료되었습니다."),
-	BAD_REQUEST_REFRESHTOKEN_NOTVALID(214, "refreshToken가 저장된 것과 다릅니다."),
-//	BAD_REQUEST_(213, "refreshToken이 만료되었습니다."),
-
+	BAD_REQUEST_ALREADY_PROCESSED_APPLICANT(212, "해당 지원자를 이미 승인 또는 거절했습니다."),
+	BAD_REQUEST_ACCESSTOKEN_EXPIRED(213, "accessToken이 만료되었습니다."),
+	BAD_REQUEST_REFRESHTOKEN_EXPIRED(214, "refreshToken이 만료되었습니다."),
+	BAD_REQUEST_REFRESHTOKEN_NOTVALID(215, "refreshToken가 저장된 것과 다릅니다."),
 
 	CONFLICT_USER(301, "이미 존재하는 회원입니다."),
 	CONFLICT_INSTITUTION(302, "이미 존재하는 기관입니다."),
