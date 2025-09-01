@@ -4,6 +4,7 @@ import com.hana7.ddabong.dto.MemberDTO;
 import com.hana7.ddabong.entity.Institution;
 import com.hana7.ddabong.entity.User;
 import com.hana7.ddabong.enums.ErrorCode;
+import com.hana7.ddabong.enums.ROLE;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.repository.InstitutionRepository;
 import com.hana7.ddabong.repository.UserRepository;
@@ -29,10 +30,10 @@ public class MemberServiceImpl  implements UserDetailsService {
 			if(institution == null){
 				throw new UsernameNotFoundException(username);
 			} else if(institution.getDeletedAt() == null){
-				return new MemberDTO(institution.getEmail(), institution.getPassword(), institution.getName());
+				return new MemberDTO(institution.getEmail(), institution.getPassword(), institution.getName(), ROLE.ROLE_INSTITUTION.name());
 			}
 		} else {
-			return new MemberDTO(user.getEmail(), user.getPassword(), user.getName());
+			return new MemberDTO(user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name());
 		}
 		return null;
 	}

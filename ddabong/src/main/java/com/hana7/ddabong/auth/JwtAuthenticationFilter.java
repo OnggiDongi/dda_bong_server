@@ -36,7 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			"/swagger-ui/**",
 			"/v3/api-docs/**",
 			"/upload/**",
-			"/kakao/login"
+			"/kakao/login",
+			// 배포 서버용
+			"/api/v3/api-docs/**",
+			"/api/swagger-ui/**",
+			"/api/kakao/login",
+			"/api/login",
+			"/api/users/signin",
+			"/api/users/signup",
+			"/api/institutions/signup",
+			"/api/api/public/**",
+			"/api/favicon.ico",
+			"/api/actuator/**",
+			"/api/*.html",
 	};
 
 	@Override
@@ -57,7 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			String email = (String)claims.get("email");
 			String name = (String)claims.get("name");
-			MemberDTO dto = new MemberDTO(email, "", name);
+			String role = (String)claims.get("role");
+			MemberDTO dto = new MemberDTO(email, "", name, role);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 					UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
