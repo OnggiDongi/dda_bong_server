@@ -1,6 +1,8 @@
 package com.hana7.ddabong.service;
 
 import com.hana7.ddabong.dto.ApplicantDetailResponseDTO;
+import com.hana7.ddabong.dto.ApplicantListDTO;
+import com.hana7.ddabong.dto.ApplicantReviewResponseDTO;
 import com.hana7.ddabong.dto.UserReviewResponseDTO;
 import com.hana7.ddabong.entity.*;
 import com.hana7.ddabong.enums.ApprovalStatus;
@@ -8,6 +10,7 @@ import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
+import com.hana7.ddabong.repository.ActivityPostRepository;
 import com.hana7.ddabong.repository.ApplicantRepository;
 import com.hana7.ddabong.repository.InstitutionRepository;
 import com.hana7.ddabong.repository.UserRepository;
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,6 +33,7 @@ public class ApplicantService {
 	private final InstitutionRepository	institutionRepository;
 	private final UserRepository userRepository;
 	private final UserReviewRepository userReviewRepository;
+	private final ActivityPostRepository activityPostRepository;
 
 	@Transactional
 	public void rejectApplicant(String email, Long applicantId) {
@@ -108,6 +114,55 @@ public class ApplicantService {
 				.build();
 	}
 
+	public ApplicantListDTO getApplicants(String email, Long activityPostId){
+		Institution institution = institutionRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		ActivityPost activityPost = activityPostRepository.findById(activityPostId)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
+
+		// ApplicantListDTO.builder().
+
+		List<Applicant> applicants = applicantRepository.findByActivityPostId(activityPostId);
+
+		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
+			User user = applicant.getUser();
+			List<UserReview> userReviews = userReviewRepository.findByUserId(user.getId());
+
+			double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
+			double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
+			double avgAttitude = userReviews.stream().mapToDouble(UserReview::getAttitude).average().orElse(0.0);
+			double totalRate = (avgHealth + avgDiligence + avgAttitude) / 3.0;
+
+			return ApplicantReviewResponseDTO.builder()
+					.id(applicant.getId())
+					.name(user.getName())
+					.rate(formatAverage(totalRate))
+					.aiComment("") // TODO : AI 붙이면 넣기
+					.diligenceLevel(formatAverage(avgDiligence))
+					.healthStatus(formatAverage(avgHealth))
+					.attitude(formatAverage(avgAttitude))
+					.status(applicant.getStatus().getDescription())
+					.profileImage(user.getProfileImage())
+					.build();
+			}
+		).toList();
+
+		return ApplicantListDTO.builder()
+			.category(activityPost.getActivity().getCategory().getDescription())
+			.title(activityPost.getTitle())
+			.endAt(String.format("%d.%02d.%02d",
+				activityPost.getEndAt().getYear(),
+				activityPost.getEndAt().getMonthValue(),
+				activityPost.getEndAt().getDayOfMonth()))
+			.imageUrl(activityPost.getImageUrl())
+			.applicantNum(activityPost.getApplicants().size())
+			.capacity(activityPost.getCapacity())
+			.reviews(list)
+			.build();
+
+	}
+
 	private List<UserReviewResponseDTO> toReviewDto(List<UserReview> userReviews){
 		return userReviews.stream()
 				.map(review -> {
@@ -140,7 +195,7 @@ public class ApplicantService {
 		return String.format("%d.%02d.%02d", birthDate.getYear(), birthDate.getMonthValue(), birthDate.getDayOfMonth());
 	}
 
-	private double formatAverage(double value){
+	public double formatAverage(double value){
 		String format = String.format("%.1f", value);
 		return Double.parseDouble(format);
 	}

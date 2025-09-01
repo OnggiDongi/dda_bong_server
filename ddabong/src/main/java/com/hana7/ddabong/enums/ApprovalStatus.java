@@ -1,5 +1,8 @@
 package com.hana7.ddabong.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ApprovalStatus {
 	PENDING("승인 대기 중"),
 	APPROVED("승인 완료"),
