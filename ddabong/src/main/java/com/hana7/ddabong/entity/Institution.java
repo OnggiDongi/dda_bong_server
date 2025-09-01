@@ -16,10 +16,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@Builder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Institution extends BaseEntity{

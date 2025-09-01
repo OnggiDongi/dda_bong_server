@@ -2,6 +2,8 @@ package com.hana7.ddabong.entity;
 
 import com.hana7.ddabong.enums.ApprovalStatus;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,14 +16,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Builder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class SupportRequest extends BaseEntity{

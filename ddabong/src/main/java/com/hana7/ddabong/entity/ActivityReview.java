@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
@@ -22,7 +23,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 public class ActivityReview extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +35,7 @@ public class ActivityReview extends BaseEntity {
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String content;
 
-	@Column(name = "image_url", length = 128, nullable = false)
+	@Column(name = "image_url", length = 128)
 	private String imageUrl;
 
 	@ManyToOne(fetch = FetchType.LAZY)

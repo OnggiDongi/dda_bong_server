@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 
@@ -31,7 +33,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 public class ActivityPost extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +54,7 @@ public class ActivityPost extends BaseEntity {
 	private LocalDateTime endAt;
 
 	@Comment("모집 시작일시")
-	@Column(name = "recruitment_start", nullable = false)
+	@Column(name = "recruitment_start")
 	private LocalDateTime recruitmentStart;
 
 	@Comment("모집 종료일시")
@@ -78,12 +80,7 @@ public class ActivityPost extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 		name = "activity_id",
-		foreignKey = @ForeignKey(name = "fk_ActivityPost_Activity",
-			foreignKeyDefinition = """
-					foreign key (activity_id)
-					references Activity(id)
-					on DELETE set null on UPDATE cascade
-				""")
+		foreignKey = @ForeignKey(name = "fk_ActivityPost_Activity")
 	)
 	private Activity activity;
 
@@ -110,4 +107,12 @@ public class ActivityPost extends BaseEntity {
 	@Builder.Default
 	@ToString.Exclude
 	private List<Applicant>	applicants = new ArrayList<>();
+
+	@OneToMany(
+			mappedBy = "activityPost",
+			cascade =  CascadeType.ALL
+	)
+	@Builder.Default
+	@ToString.Exclude
+	private List<UserReview> userReviews = new ArrayList<>();
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.hana7.ddabong.enums.Category;
@@ -26,7 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
@@ -84,7 +85,10 @@ public class User extends BaseEntity{
 	@ToString.Exclude
 	private List<ActivityReview> activityReviews = new ArrayList<>();
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(
+			mappedBy = "user",
+			cascade = CascadeType.ALL
+	)
 	@Builder.Default
 	@ToString.Exclude
 	private List<Likes> likes = new ArrayList<>();
