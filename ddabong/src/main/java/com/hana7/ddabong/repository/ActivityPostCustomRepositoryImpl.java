@@ -32,9 +32,12 @@ public class ActivityPostCustomRepositoryImpl implements ActivityPostCustomRepos
         QActivityPost qActivityPost = QActivityPost.activityPost;
         QActivity qActivity = QActivity.activity;
 
+        // where문
         BooleanExpression regionFilter = hasText(searchRegion) ? qActivityPost.location.contains(searchRegion) : null;
         BooleanExpression categoryFilter = (categories != null && !categories.isEmpty()) ? qActivity.category.in(categories) : null;
+        BooleanExpression notDeletedFilter = qActivityPost.deletedAt.isNull();
 
+        // order
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
         if (!hasText(searchRegion) && hasText(preferredRegion)) {
             OrderSpecifier<Integer> preferFirst =
@@ -49,7 +52,7 @@ public class ActivityPostCustomRepositoryImpl implements ActivityPostCustomRepos
 
         List<ActivityPost> activityPosts = jpaQueryFactory.selectFrom(qActivityPost)
                 .join(qActivityPost.activity, qActivity)
-                .where(regionFilter, categoryFilter)
+                .where(regionFilter, categoryFilter, notDeletedFilter)
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

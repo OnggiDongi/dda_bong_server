@@ -74,7 +74,6 @@ public class ActivityPostService {
 	public ResponseEntity<List<ActivityPostResponseDTO>> readActivityPostList(
 			int page, int pageSize, String searchRegion, String categories, String userEmail
 	) {
-		System.out.println("dafdfsadfsdadfa"+userEmail);
 		User user = userRepository.findByEmail(userEmail)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
