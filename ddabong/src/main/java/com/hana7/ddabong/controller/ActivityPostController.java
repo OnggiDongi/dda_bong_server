@@ -45,9 +45,49 @@ public class ActivityPostController {
 	}
 
 	@Tag(name = "봉사활동 게시물 API")
+	@Operation(summary = "게시물 조회(리스트)")
+	@GetMapping(value = "")
+	public ResponseEntity<List<ActivityPostResponseDTO>> readActivityPostList(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(required = false) String searchRegion,
+			@RequestParam(required = false) String categories,
+			Authentication authentication
+	) {
+		return activityPostService.readActivityPostList(page, pageSize, searchRegion, categories, authentication.getName());
+	}
+
+	@Tag(name = "봉사활동 게시물 API")
 	@Operation(summary = "게시물 수정")
-	@PatchMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> updateActivityPost() {
+	@PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateActivityPost(
+			@PathVariable Long id,
+			ActivityPostRequestDTO dto,
+			Authentication authentication
+	) throws IOException {
+		activityPostService.updateActivityPost(id, dto, authentication.getName());
+		return ResponseEntity.ok().build();
+	}
+
+	@Tag(name = "봉사활동 게시물 API")
+	@Operation(summary = "게시물 삭제")
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity<?> deleteActivityPost(
+			@PathVariable Long id,
+			Authentication authentication
+	) {
+		activityPostService.deleteActivityPost(id, authentication.getName());
+		return ResponseEntity.ok().build();
+	}
+
+	@Tag(name = "봉사활동 게시물 API")
+	@Operation(summary = "봉사 모집 마감하기")
+	@PostMapping(value = "/{id}")
+	public ResponseEntity<?> closeActivityPost(
+			@PathVariable Long id,
+			Authentication authentication
+	) {
+		activityPostService.closeActivityPost(id, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 

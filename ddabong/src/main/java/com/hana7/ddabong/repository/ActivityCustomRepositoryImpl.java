@@ -21,7 +21,6 @@ public class ActivityCustomRepositoryImpl implements ActivityCustomRepository {
     @Override
     public Page<Activity> findActivityByInstitution(Long institutionId, Pageable pageable, String keyWord) {
         QActivity qActivity = QActivity.activity;
-
         List<Activity> activities = jpaQueryFactory.selectFrom(qActivity)
                 .where(
                         qActivity.title.containsIgnoreCase(keyWord),
