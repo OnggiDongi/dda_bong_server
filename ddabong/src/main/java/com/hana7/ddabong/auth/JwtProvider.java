@@ -4,9 +4,11 @@ import com.hana7.ddabong.dto.MemberDTO;
 import com.hana7.ddabong.dto.OauthUserDTO;
 import com.hana7.ddabong.enums.ROLE;
 import com.hana7.ddabong.exception.CustomJwtException;
+import com.hana7.ddabong.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -30,7 +32,7 @@ public class JwtProvider {
 
 	// Authentication 속 pricipal 정보들로 JWT Token 생성하기
 	public static String generateToken(Map<String, Object> valueMap, int min) {
-		return Jwts.builder().setHeader(java.util.Map.of("typ", "JWT"))
+		return Jwts.builder().setHeader(Map.of("typ", "JWT"))
 				.setClaims(valueMap)
 				.setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
 				.setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
@@ -38,7 +40,6 @@ public class JwtProvider {
 	}
 
 	public static Map<String, Object> getClaims(Authentication authentication) {
-		System.out.println("authentication.getPrincipal() = " + authentication.getPrincipal());
 		MemberDTO dto;
 		Map<String, Object> claims =  new HashMap<>();
 
@@ -58,7 +59,7 @@ public class JwtProvider {
 		claims = dto.getClaims();
 
 
-		String accessToken  = generateToken(new HashMap<>(claims), 10);
+		String accessToken  = generateToken(new HashMap<>(claims), 60);
 		String refreshToken = generateToken(new HashMap<>(claims), 60 * 24);
 
 		Map<String, Object> body = new HashMap<>(claims);
@@ -91,5 +92,15 @@ public class JwtProvider {
 		}
 
 		return claim;
+	}
+
+	public static String getEmailFromToken(String token) {
+		Claims claims = Jwts.parserBuilder()
+				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+
+		return (String) claims.get("email");
 	}
 }

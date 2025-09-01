@@ -35,16 +35,13 @@ public class LikesService {
 
 		Likes save;
 		if(like.isPresent() && like.get().getDeletedAt() != null){ // 찜하기 취소인 경우
-			System.out.println("1");
 			save = like.get().toBuilder()
 					.deletedAt(null)
 					.build();
 		} else if (like.isPresent() && like.get().getDeletedAt() == null){ // 이미 찜하기를 누른 경우
-			System.out.println("2");
 			save = like.get();
 			save.markDeleted();
 		} else { // 해당 모집글에 처음으로 찜하기를 누른 경우
-			System.out.println("3");
 			save = Likes.builder()
 					.activityPost(activityPost)
 					.user(user)

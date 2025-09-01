@@ -25,30 +25,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-			"/login",
-			"/users/signin",
-			"/users/signup",
-			"/institutions/signup",
-			"/api/public/**",
-			"/favicon.ico",
-			"/actuator/**",
-			"/*.html",
-			"/swagger-ui/**",
-			"/v3/api-docs/**",
-			"/upload/**",
-			"/kakao/login",
-			// 배포 서버용
-			"/api/v3/api-docs/**",
-			"/api/swagger-ui/**",
-			"/api/kakao/login",
-			"/api/login",
-			"/api/users/signin",
-			"/api/users/signup",
-			"/api/institutions/signup",
-			"/api/api/public/**",
-			"/api/favicon.ico",
-			"/api/actuator/**",
-			"/api/*.html",
+		// 배포 서버용
+		"/api/v3/api-docs/**",
+		"/api/swagger-ui/**",
+		"/api/kakao/login",
+		"/api/login",
+		"/api/users/signin",
+		"/api/users/signup",
+		"/api/institutions/signup",
+		"/api/api/public/**",
+		"/api/favicon.ico",
+		"/api/actuator/**",
+		"/api/*.html",
+		"/api/auth/refresh",
+		"/api/upload/**",
 	};
 
 	@Override
@@ -61,9 +51,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 									@NonNull FilterChain filterChain) throws ServletException, IOException {
+		String uri = request.getRequestURI();
+
+		// ✅ refresh 요청은 accessToken 없이 통과시켜야 함
+		if (uri.equals("/auth/refresh")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+		System.out.println("authHeader: " + authHeader);
 		try {
-			System.out.println();
 			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 

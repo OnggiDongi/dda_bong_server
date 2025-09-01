@@ -44,7 +44,6 @@ public class CustomOAuthService implements OAuth2UserService<OAuth2UserRequest, 
 				.getUserNameAttributeName();
 
 		Map<String, Object> attributes = oAuth2User.getAttributes();
-		System.out.println("attributes = " + attributes);
 		OAuth2AccessToken accessToken = userRequest.getAccessToken();
 
 		KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(attributes);

@@ -1,7 +1,9 @@
 package com.hana7.ddabong.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import com.hana7.ddabong.auth.JwtProvider;
 import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
@@ -76,5 +78,11 @@ public class UserController {
 	public ResponseEntity<?> signUser(@Validated @RequestBody UserRequestDTO userRequestDTO){
 		userService.signup(userRequestDTO);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/login/kakao")
+	public ResponseEntity<Map<String, Object>> loginKakao(Authentication authentication) {
+		Map<String, Object> response = JwtProvider.getClaims(authentication);
+		return ResponseEntity.ok(response);
 	}
 }
