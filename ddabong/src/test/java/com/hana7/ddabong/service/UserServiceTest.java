@@ -10,12 +10,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest
+@Transactional
+@Rollback
 class UserServiceTest {
 
 	@Autowired
@@ -41,7 +45,7 @@ class UserServiceTest {
 				.build();
 
 		// when
-		userService.signin(dto);
+		userService.signup(dto);
 
 		User findUser = userRepository.findByEmail(dto.getEmail()).orElse(null);
 
@@ -73,7 +77,7 @@ class UserServiceTest {
 				.build();
 
 		// when + then
-		assertThatThrownBy(() -> userService.signin(dto))
+		assertThatThrownBy(() -> userService.signup(dto))
 				.isInstanceOf(ConflictException.class);
 	}
 }
