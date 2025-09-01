@@ -107,4 +107,12 @@ public class ActivityPost extends BaseEntity {
 	@Builder.Default
 	@ToString.Exclude
 	private List<Applicant>	applicants = new ArrayList<>();
+
+	@OneToMany(
+			mappedBy = "activityPost",
+			cascade =  CascadeType.ALL
+	)
+	@Builder.Default
+	@ToString.Exclude
+	private List<UserReview> userReviews = new ArrayList<>();
 }

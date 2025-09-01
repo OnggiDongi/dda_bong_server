@@ -12,9 +12,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserReviewResponseDTO {
     private Long id;
+
+    private String activityTitle;
+    private String activityEndAt;
+    private String activityCategory;
+    private String activityImage;
+
+    private double totalRate;
     private int healthStatus;
     private int diligenceLevel;
     private int attitude;
+
     private String memo;
     private Long writeInst;
     private LocalDateTime createdAt;
