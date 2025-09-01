@@ -1,6 +1,7 @@
 package com.hana7.ddabong.controller;
 
 import com.hana7.ddabong.dto.ApplicantDetailResponseDTO;
+import com.hana7.ddabong.dto.ApplicantListDTO;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
@@ -64,6 +65,5 @@ public class ApplicantController {
 		ApplicantDetailResponseDTO applicantInfo = applicantService.getApplicantInfo(userId);
 		return ResponseEntity.ok(applicantInfo);
 	}
-
 
 }

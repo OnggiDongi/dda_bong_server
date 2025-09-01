@@ -14,4 +14,7 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
     boolean existsByUserAndActivityPostId(User user, Long activityPostId);
 
     Optional<Applicant> findByUserAndActivityPost(User user, ActivityPost activityPost);
+
+
+    List<Applicant> findByActivityPostIdAndDeletedAtIsNull(Long activityPostId);
 }

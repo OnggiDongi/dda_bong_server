@@ -3,9 +3,11 @@ package com.hana7.ddabong.controller;
 import com.hana7.ddabong.dto.ActivityPostDetailResponseDTO;
 import com.hana7.ddabong.dto.ActivityPostRequestDTO;
 import com.hana7.ddabong.dto.ActivityPostResponseDTO;
+import com.hana7.ddabong.dto.ApplicantListDTO;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.ActivityPostService;
+import com.hana7.ddabong.service.ApplicantService;
 import com.hana7.ddabong.service.LikesService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,7 @@ import java.util.List;
 public class ActivityPostController {
 	private final ActivityPostService activityPostService;
 	private final LikesService likesService;
+	private final ApplicantService applicantService;
 
 	@Tag(name = "봉사활동 게시물 API")
 	@Operation(summary = "게시물 등록")
@@ -174,4 +177,21 @@ public class ActivityPostController {
 		likesService.likeActivityPost(authentication.getName(), activityPostId);
 		return ResponseEntity.ok().build();
 	}
+
+	@Tag(name = "봉사 지원자 목록 확인하기")
+	@Operation(summary = "기관은 자신이 등록한 봉사 모집글에 봉사 신청한 지원자 목록을 확인할 수 있다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "해당 봉사 모집글에 지원한 지원자 목록입니다.", content = @Content(mediaType = "application/json")),
+		@ApiResponse(responseCode = "404",
+			description = "해당하는 기관 | 봉사 모집글이 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
+	})
+	@GetMapping("/apply/{activityPostId}")
+	public ResponseEntity<ApplicantListDTO> getApplicantList(
+		@PathVariable Long activityPostId,
+		Authentication authentication
+	) {
+		return ResponseEntity.ok(applicantService.getApplicants(authentication.getName(), activityPostId));
+	}
+
 }
