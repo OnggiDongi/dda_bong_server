@@ -15,5 +15,6 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
 
     Optional<Applicant> findByUserAndActivityPost(User user, ActivityPost activityPost);
 
-    List<Applicant> findByActivityPostId(Long activityPostId);
+
+    List<Applicant> findByActivityPostIdAndDeletedAtIsNull(Long activityPostId);
 }

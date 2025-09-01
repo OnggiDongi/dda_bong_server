@@ -121,10 +121,8 @@ public class ApplicantService {
 		ActivityPost activityPost = activityPostRepository.findById(activityPostId)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
-		// ApplicantListDTO.builder().
 
-		List<Applicant> applicants = applicantRepository.findByActivityPostId(activityPostId);
-
+		List<Applicant> applicants = applicantRepository.findByActivityPostIdAndDeletedAtIsNull(activityPostId);
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
 			User user = applicant.getUser();
 			List<UserReview> userReviews = userReviewRepository.findByUserId(user.getId());
