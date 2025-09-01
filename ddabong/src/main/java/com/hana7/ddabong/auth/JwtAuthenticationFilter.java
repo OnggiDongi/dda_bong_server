@@ -44,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(@NonNull HttpServletRequest request){
 		String path = request.getRequestURI();
-		System.out.println(path);
 		return Arrays.stream(excludePatterns)
 				.anyMatch(pattern -> pathMatcher.match(pattern, path));
 	}
@@ -62,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		System.out.println("authHeader: " + authHeader);
 		try {
-			System.out.println();
 			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 

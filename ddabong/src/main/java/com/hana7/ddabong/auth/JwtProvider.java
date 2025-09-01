@@ -40,7 +40,6 @@ public class JwtProvider {
 	}
 
 	public static Map<String, Object> getClaims(Authentication authentication) {
-		System.out.println("authentication.getPrincipal() = " + authentication.getPrincipal());
 		MemberDTO dto;
 		Map<String, Object> claims =  new HashMap<>();
 
@@ -102,7 +101,6 @@ public class JwtProvider {
 				.parseClaimsJws(token)
 				.getBody();
 
-		System.out.println("claims = " + claims);
 		return (String) claims.get("email");
 	}
 }

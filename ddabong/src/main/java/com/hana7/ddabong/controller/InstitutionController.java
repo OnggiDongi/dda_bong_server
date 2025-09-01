@@ -81,7 +81,6 @@ public class InstitutionController {
 	@DeleteMapping("")
 	public ResponseEntity<?> getInstitutionInfo(Authentication authentication){
 		String email = authentication.getName();
-		System.out.println("email = " + email);
 		institutionService.delete(email);
 		return ResponseEntity.ok().build();
 	}

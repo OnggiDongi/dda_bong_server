@@ -83,7 +83,6 @@ public class UserController {
 	@GetMapping("/login/kakao")
 	public ResponseEntity<Map<String, Object>> loginKakao(Authentication authentication) {
 		Map<String, Object> response = JwtProvider.getClaims(authentication);
-		System.out.println("카카오로 로그인중!~~~~~");
 		return ResponseEntity.ok(response);
 	}
 }
