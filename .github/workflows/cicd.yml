@@ -1,0 +1,47 @@
+name: Ddabong CI/CD
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5.0.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: set props
+        working-directory: ddabong
+        run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
+
+      - name: grant exe to gradlew
+        working-directory: ddabong
+        run: chmod +x gradlew
+
+      - name: build with gradle
+        working-directory: ddabong
+        run: ./gradlew clean build -x test
+
+      - name: setup ssh
+        run: |
+           mkdir -p ~/.ssh
+           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+           chmod 400 ~/.ssh/id_rsa
+           ssh-keyscan ${{ secrets.WAS }} >> ~/.ssh/known_hosts
+           chmod 600 ~/.ssh/known_hosts
+
+      - name: scp jar to was
+        run: |
+          scp ddabong/build/libs/*.jar ec2-user@${{ secrets.WAS }}:/home/ec2-user/workspace/hana.jar
+
+      - name: restart spring
+        run: |
+          ssh ec2-user@${{ secrets.WAS }} '
+            cd /home/ec2-user/workspace &&
+            sudo systemctl restart springboot
+          '    

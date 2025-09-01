@@ -25,19 +25,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-			"/login",
-			"/users/signin",
-			"/users/signup",
-			"/institutions/signup",
-			"/api/public/**",
-			"/favicon.ico",
-			"/actuator/**",
-			"/*.html",
-			"/swagger-ui/**",
-			"/v3/api-docs/**",
-			"/upload/**",
-			"/kakao/login",
-			"/auth/refresh"
+		// 배포 서버용
+		"/api/v3/api-docs/**",
+		"/api/swagger-ui/**",
+		"/api/kakao/login",
+		"/api/login",
+		"/api/users/signin",
+		"/api/users/signup",
+		"/api/institutions/signup",
+		"/api/api/public/**",
+		"/api/favicon.ico",
+		"/api/actuator/**",
+		"/api/*.html",
+		"/api/auth/refresh",
+		"/api/upload/**",
 	};
 
 	@Override
