@@ -114,7 +114,7 @@ public class ApplicantService {
 				.build();
 	}
 
-	public ApplicantListDTO getApplicants(String email, Long activityPostId){
+	public ApplicantListDTO getApplicants(String email, Long activityPostId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -124,40 +124,41 @@ public class ApplicantService {
 
 		List<Applicant> applicants = applicantRepository.findByActivityPostIdAndDeletedAtIsNull(activityPostId);
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
-			User user = applicant.getUser();
-			List<UserReview> userReviews = userReviewRepository.findByUserId(user.getId());
+					User user = applicant.getUser();
+					List<UserReview> userReviews = userReviewRepository.findByUserId(user.getId());
 
-			double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
-			double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
-			double avgAttitude = userReviews.stream().mapToDouble(UserReview::getAttitude).average().orElse(0.0);
-			double totalRate = (avgHealth + avgDiligence + avgAttitude) / 3.0;
+					double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
+					double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
+					double avgAttitude = userReviews.stream().mapToDouble(UserReview::getAttitude).average().orElse(0.0);
+					double totalRate = (avgHealth + avgDiligence + avgAttitude) / 3.0;
 
-			return ApplicantReviewResponseDTO.builder()
-					.id(applicant.getId())
-					.name(user.getName())
-					.rate(formatAverage(totalRate))
-					.aiComment("") // TODO : AI 붙이면 넣기
-					.diligenceLevel(formatAverage(avgDiligence))
-					.healthStatus(formatAverage(avgHealth))
-					.attitude(formatAverage(avgAttitude))
-					.status(applicant.getStatus().getDescription())
-					.profileImage(user.getProfileImage())
-					.build();
-			}
+					return ApplicantReviewResponseDTO.builder()
+							.id(applicant.getId())
+							.name(user.getName())
+							.rate(formatAverage(totalRate))
+							.aiComment("") // TODO : AI 붙이면 넣기
+							.diligenceLevel(formatAverage(avgDiligence))
+							.healthStatus(formatAverage(avgHealth))
+							.attitude(formatAverage(avgAttitude))
+							.status(applicant.getStatus().getDescription())
+							.profileImage(user.getProfileImage())
+							.build();
+				}
 		).toList();
 
 		return ApplicantListDTO.builder()
-			.category(activityPost.getActivity().getCategory().getDescription())
-			.title(activityPost.getTitle())
-			.endAt(String.format("%d.%02d.%02d",
-				activityPost.getEndAt().getYear(),
-				activityPost.getEndAt().getMonthValue(),
-				activityPost.getEndAt().getDayOfMonth()))
-			.imageUrl(activityPost.getImageUrl())
-			.applicantNum(activityPost.getApplicants().size())
-			.capacity(activityPost.getCapacity())
-			.reviews(list)
-			.build();
+				.category(activityPost.getActivity().getCategory().getDescription())
+				.title(activityPost.getTitle())
+				.endAt(String.format("%d.%02d.%02d",
+						activityPost.getEndAt().getYear(),
+						activityPost.getEndAt().getMonthValue(),
+						activityPost.getEndAt().getDayOfMonth()))
+				.imageUrl(activityPost.getImageUrl())
+				.applicantNum(activityPost.getApplicants().size())
+				.capacity(activityPost.getCapacity())
+				.reviews(list)
+				.build();
+	}
 
 	@Transactional
 	public void approveApplicant(String email, Long applicantId) {
