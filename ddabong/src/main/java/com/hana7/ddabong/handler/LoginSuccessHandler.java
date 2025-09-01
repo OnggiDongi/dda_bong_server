@@ -27,8 +27,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 										Authentication authentication) throws IOException {
 
 		Map<String, Object> body = JwtProvider.getClaims(authentication);
-		System.out.println("body.get(\"email\") = " + body.get("email").toString());
-		System.out.println("body.get(\"refreshToken\") = " + body.get("refreshToken").toString());
+
 		refreshTokenService.saveRefreshToken(body.get("email").toString(), body.get("refreshToken").toString(), 60 * 24); // 1일
 
 

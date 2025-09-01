@@ -62,11 +62,12 @@ public class SecurityConfig {
 				.exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeniedHandler()))
 				.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-		http.authorizeHttpRequests(auth -> auth
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.requestMatchers("/auth/refresh").permitAll()
-				.anyRequest().authenticated()
-		);
+//		http.authorizeHttpRequests(auth -> auth
+//				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//				.requestMatchers("/auth/refresh").permitAll()
+//				.requestMatchers(HttpMethod.POST, "/upload/**").permitAll()
+//				.anyRequest().authenticated()
+//		);
 		return http.build();
 	}
 
