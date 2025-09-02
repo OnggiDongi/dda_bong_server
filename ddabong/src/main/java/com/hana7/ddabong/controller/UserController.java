@@ -8,10 +8,14 @@ import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
+import com.hana7.ddabong.dto.UserSummaryResponseDTO;
 import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
+import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.UserService;
+import com.hana7.ddabong.service.UserSummaryService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,8 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+	private final UserSummaryService userSummaryService;
 
-    @GetMapping("/{id}")
+	@GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findUserById(id));
     }
@@ -85,5 +90,22 @@ public class UserController {
 		Map<String, Object> response = JwtProvider.getClaims(authentication);
 		System.out.println("response = " + response);
 		return ResponseEntity.ok(response);
+	}
+
+	@Tag(name = "이메일로 유저 정보 요약 조회")
+	@Operation(summary = "유저의 이메일로 유저 정보(이름, 등급, 누적 봉사시간) 조회")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보 요약을 성공적으로 조회했습니다.", content = @Content(mediaType = "application/json")),
+		@ApiResponse(responseCode = "404",
+			description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
+		@ApiResponse(responseCode = "400",
+			description = "잘못된 요청입니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
+	})
+	@GetMapping("/summary")
+	public ResponseEntity<UserSummaryResponseDTO> getUserSummaryByEmail(Authentication authentication) {
+		String email = authentication.getName();
+		return ResponseEntity.ok(userSummaryService.findUserSummaryByEmail(email));
 	}
 }
