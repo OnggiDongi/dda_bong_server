@@ -2,6 +2,7 @@ package com.hana7.ddabong.service;
 
 import com.hana7.ddabong.dto.InstitutionRequestDTO;
 import com.hana7.ddabong.dto.InstitutionResponseDTO;
+import com.hana7.ddabong.dto.InstitutionSummaryResponseDTO;
 import com.hana7.ddabong.entity.Institution;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.ConflictException;
@@ -81,5 +82,15 @@ public class InstitutionService {
 				.phoneNumber(institution.getPhoneNumber())
 				.detail(institution.getDetail())
 				.build();
+	}
+
+	@Transactional
+	public InstitutionSummaryResponseDTO findInstitutionSummaryByEmail(String email) {
+		Institution institution = institutionRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		return InstitutionSummaryResponseDTO.builder()
+			.name(institution.getName())
+			.build();
 	}
 }
