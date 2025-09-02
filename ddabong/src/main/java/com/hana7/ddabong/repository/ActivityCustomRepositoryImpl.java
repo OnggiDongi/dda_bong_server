@@ -24,7 +24,8 @@ public class ActivityCustomRepositoryImpl implements ActivityCustomRepository {
         List<Activity> activities = jpaQueryFactory.selectFrom(qActivity)
                 .where(
                         qActivity.title.containsIgnoreCase(keyWord),
-                        qActivity.institution.id.eq(institutionId)
+                        qActivity.institution.id.eq(institutionId),
+                        qActivity.deletedAt.isNull()
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

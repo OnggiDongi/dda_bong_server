@@ -66,7 +66,7 @@ public class ActivityService {
     public ResponseEntity<ActivityResponseDTO> readActivity(Long activityId, String userEmail) {
         Institution institution = institutionRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
-        Activity activity = activityRepository.findById(activityId)
+        Activity activity = activityRepository.findByIdAndDeletedAtIsNull(activityId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY));
 
         if (!activity.getInstitution().getId().equals(institution.getId())) {
