@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana7.ddabong.dto.KakaoUserInfo;
 import com.hana7.ddabong.dto.MemberDTO;
 import com.hana7.ddabong.entity.User;
+import com.hana7.ddabong.enums.ROLE;
 import com.hana7.ddabong.repository.UserRepository;
 import com.sun.security.auth.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -20,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +42,7 @@ public class CustomOAuthService implements OAuth2UserService<OAuth2UserRequest, 
 		String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
 				.getUserNameAttributeName();
 
-		Map<String, Object> attributes = oAuth2User.getAttributes();
+		Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
 		OAuth2AccessToken accessToken = userRequest.getAccessToken();
 
 		KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(attributes);
@@ -61,10 +60,19 @@ public class CustomOAuthService implements OAuth2UserService<OAuth2UserRequest, 
 					.profileImage(kakaoUserInfo.getProfileImage())
 					.build();
 			userRepository.save(newUser);
+			attributes.put("firstLogin", true);
+			return new DefaultOAuth2User( List.of(new SimpleGrantedAuthority(ROLE.ROLE_USER.name())), attributes, userNameAttributeName);
 		}
 
+		if (findUser.getPreferredRegion() != null && findUser.getPreferredCategory() != null) {
+			attributes.put("firstLogin", false);
+		} else {
+			attributes.put("firstLogin", true);
+		}
+
+		System.out.println("customOauthService - loadUser");
 		// Security context에 저장할 객체 생성
-		return new DefaultOAuth2User(new ArrayList<>(), attributes, userNameAttributeName);
+		return new DefaultOAuth2User( List.of(new SimpleGrantedAuthority(ROLE.ROLE_USER.name())), attributes, userNameAttributeName);
 	}
 
 }
