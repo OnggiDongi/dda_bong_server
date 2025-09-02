@@ -116,6 +116,8 @@ public class UserService {
                 .build();
     }
 
+
+    @Transactional
 	public void signup(UserRequestDTO userRequestDTO) {
 		// 같은 아이디 있는지 확인하기
 		User user = userRepository.findByEmail(userRequestDTO.getEmail())
