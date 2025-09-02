@@ -71,7 +71,7 @@ public class UserController {
 	@Tag(name = "회원가입 - 일반회원")
 	@Operation(summary = "모든 사용자는 아이디, 비밀번호, 이름, 전화번호, 생년월일을 통해 회원가입을 할 수 있다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "회원가입에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "200", description = "회원가입에 성공했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserSummaryResponseDTO.class))),
 			@ApiResponse(responseCode = "400",
 					description = "생년월일이 현재보다 미래일 수 없습니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))),
