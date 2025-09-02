@@ -1,4 +1,3 @@
--- Institution
 INSERT INTO institution (id, name, email, password, phone_number, detail) VALUES
                                                                               (1, '하나금융', 'hana@hana.com', '1234', '010-1111-1111', '하나금융그룹입니다.'),
                                                                               (2, '네이버', 'naver@naver.com', '1234', '010-2222-2222', '네이버입니다.'),
@@ -15,7 +14,6 @@ INSERT INTO institution (id, name, email, password, phone_number, detail) VALUES
                                                                               (13, 'KT', 'kt@kt.com', '1234', '010-1919-1919', 'KT입니다.'),
                                                                               (14, '한화', 'hanwha@hanwha.com', '1234', '010-2020-2020', '한화그룹입니다.'),
                                                                               (15, '신세계', 'shinsegae@ssg.com', '1234', '010-2121-2121', '신세계그룹입니다.');
--- User
 INSERT INTO user (id, name, email, password, phone_number, total_hour, birthdate, is_kakao, preferred_region) VALUES
                                                                                                                   (1, '김봉사', 'test@test', '$2a$10$YlakYH21qBT7qymZ4bJH7e7RUkERACdgBYSbQcU/RV8MM61KL3M3m', '010-3333-3333', 10, '1990-01-01', false, '서울'),
                                                                                                                   (2, '이봉사', 'lee@ddabong.com', '1234', '010-4444-4444', 20, '1995-05-05', true, '경기'),
@@ -48,7 +46,6 @@ INSERT INTO user (id, name, email, password, phone_number, total_hour, birthdate
                                                                                                                   (29, '달봉사', 'moon2@ddabong.com', '1234', '010-2728-2728', 22, '1992-02-02', false, '제주'),
                                                                                                                   (30, '구름봉사', 'cloud@ddabong.com', '1234', '010-2829-2829', 16, '1997-07-21', true, '서울');
 
--- User Preferred Category
 INSERT INTO user_preferred_category (user_id, preferred_category) VALUES
                                                                       (1, 'LIVING'), (1, 'EDUCATION'), (2, 'SAFETY'), (3, 'CULTURE'), (4, 'ENVIRONMENT'),
                                                                       (5, 'PUBLIC'), (6, 'GLOBAL'), (7, 'LIVING'), (8, 'EDUCATION'), (9, 'SAFETY'), (10, 'CULTURE'),(11, 'ENVIRONMENT'), (12, 'PUBLIC'), (13, 'GLOBAL'), (14, 'CULTURE'), (15, 'SAFETY'),
@@ -56,7 +53,6 @@ INSERT INTO user_preferred_category (user_id, preferred_category) VALUES
                                                                       (21, 'PUBLIC'), (22, 'GLOBAL'), (23, 'LIVING'), (24, 'EDUCATION'), (25, 'SAFETY'),
                                                                       (26, 'CULTURE'), (27, 'ENVIRONMENT'), (28, 'PUBLIC'), (29, 'GLOBAL'), (30, 'LIVING');
 
--- Activity
 INSERT INTO activity (id, title, content, category, institution) VALUES
                                                                      (1, '독거노인 생활 지원', '독거노인 분들의 양치를 시켜드려요.', 'LIVING', 1),
                                                                      (2, '청소년 코딩 교육', '청소년들에게 코딩을 가르칩니다.', 'EDUCATION', 2),
@@ -72,9 +68,15 @@ INSERT INTO activity (id, title, content, category, institution) VALUES
                                                                      (12, '농촌 일손 돕기', '농번기 농촌 지역에서 일손을 돕습니다.', 'GLOBAL', 12),
                                                                      (13, '어르신 반찬 만들기', '어르신들을 위한 반찬을 조리합니다.', 'LIVING', 13),
                                                                      (14, '방과후 수학 멘토링', '청소년 수학 멘토링 프로그램입니다.', 'EDUCATION', 14),
-                                                                     (15, '하천 정화 활동', '하천 주변 쓰레기를 수거합니다.', 'ENVIRONMENT', 15);
+                                                                     (15, '하천 정화 활동', '하천 주변 쓰레기를 수거합니다.', 'ENVIRONMENT', 15),
+                                                                     (16, '생활 돌봄 데이', '취약계층 가정 방문 및 생활 지원', 'LIVING', 5),
+                                                                     (17, '코딩 입문 특강', '성인 대상 파이썬 입문 교육', 'EDUCATION', 5),
+                                                                     (18, '응급처치 기초', '응급처치 이론 및 실습 교육', 'SAFETY', 5),
+                                                                     (19, '다문화 요리 교실', '다문화 가정과 함께하는 요리 체험', 'CULTURE', 5),
+                                                                     (20, '도심 하천 정화', '하천변 쓰레기 수거 및 분리', 'ENVIRONMENT', 5),
+                                                                     (21, '민원 안내 서포터즈', '행정복지센터 민원 안내 지원', 'PUBLIC', 5),
+                                                                     (22, '농가 일손 돕기(가을)', '수확철 농가 작황 보조', 'GLOBAL', 5);
 
--- ActivityPost
 INSERT INTO activity_post (id, title, content, start_at, end_at, recruitment_start, recruitment_end, is_accept, capacity, location, image_url, activity_id) VALUES
                                                                                                                                                                 (1, '독거노인 방문 봉사', '독거노인 분들을 방문하여 악어새가 되어드립니다.', '2025-09-01 10:00:00', '2025-09-01 12:00:00', '2025-08-20 09:00:00', '2025-08-31 18:00:00', true, 10, '서울시 강남구', 'http://example.com/image1.jpg', 1),
                                                                                                                                                                 (2, '코딩 멘토링', '청소년들에게 코딩 멘토링을 제공합니다.', '2025-09-10 14:00:00', '2025-09-10 16:00:00', '2025-08-25 09:00:00', '2025-09-05 18:00:00', true, 5, '경기도 성남시', 'http://example.com/image2.jpg', 2),
@@ -90,9 +92,18 @@ INSERT INTO activity_post (id, title, content, start_at, end_at, recruitment_sta
                                                                                                                                                                 (12, '가을 농촌 봉사', '농작물 수확 보조 활동입니다.', '2025-10-18 09:00:00', '2025-10-18 17:00:00', '2025-09-25 09:00:00', '2025-10-13 18:00:00', true, 22, '전주시 덕진구', 'http://example.com/image12.jpg', 12),
                                                                                                                                                                 (13, '어르신 반찬 포장', '조리된 반찬을 포장/배달합니다.', '2025-10-20 13:00:00', '2025-10-20 16:00:00', '2025-09-28 09:00:00', '2025-10-15 18:00:00', true, 12, '대구시 수성구', 'http://example.com/image13.jpg', 13),
                                                                                                                                                                 (14, '수학 멘토링 데이', '중학생 대상 수학 집중 멘토링.', '2025-10-22 10:00:00', '2025-10-22 12:30:00', '2025-10-01 09:00:00', '2025-10-17 18:00:00', true, 18, '대전시 서구', 'http://example.com/image14.jpg', 14),
-                                                                                                                                                                (15, '하천 플로깅', '하천변 플로깅을 진행합니다.', '2025-10-26 08:00:00', '2025-10-26 11:00:00', '2025-10-03 09:00:00', '2025-10-21 18:00:00', true, 20, '광주시 북구', 'http://example.com/image15.jpg', 15);
+                                                                                                                                                                (15, '하천 플로깅', '하천변 플로깅을 진행합니다.', '2025-10-26 08:00:00', '2025-10-26 11:00:00', '2025-10-03 09:00:00', '2025-10-21 18:00:00', true, 20, '광주시 북구', 'http://example.com/image15.jpg', 15),
+                                                                                                                                                                (16, '생활 돌봄 방문', '독거 어르신 가정 방문 지원', '2025-10-03 10:00:00', '2025-10-03 12:00:00', '2025-09-15 09:00:00', '2025-09-29 18:00:00', true, 10, '서울시 성동구', 'http://example.com/image16.jpg', 16),
+                                                                                                                                                                (17, '파이썬 한 번에 시작', '파이썬 기초 문법/문제 풀기', '2025-10-07 19:00:00', '2025-10-07 21:00:00', '2025-09-18 09:00:00', '2025-10-02 18:00:00', true, 20, '서울시 강남구', 'http://example.com/image17.jpg', 17),
+                                                                                                                                                                (18, '응급처치 실습반', '성인/유아 심폐소생술 실습', '2025-10-11 14:00:00', '2025-10-11 17:00:00', '2025-09-20 09:00:00', '2025-10-06 18:00:00', true, 16, '서울시 종로구', 'http://example.com/image18.jpg', 18),
+                                                                                                                                                                (19, '세계 음식 데이', '각국 음식 함께 만들고 나누기', '2025-10-15 11:00:00', '2025-10-15 14:00:00', '2025-09-25 09:00:00', '2025-10-10 18:00:00', true, 12, '서울시 용산구', 'http://example.com/image19.jpg', 19),
+                                                                                                                                                                (20, '하천 플로깅 데이', '도심 하천변 쓰레기 수거', '2025-10-19 09:00:00', '2025-10-19 12:00:00', '2025-09-28 09:00:00', '2025-10-14 18:00:00', true, 25, '서울시 서초구', 'http://example.com/image20.jpg', 20),
+                                                                                                                                                                (21, '민원 안내 부스 운영', '번호표/접수/안내 도우미', '2025-10-23 13:00:00', '2025-10-23 17:00:00', '2025-10-01 09:00:00', '2025-10-18 18:00:00', true, 8, '서울시 동대문구', 'http://example.com/image21.jpg', 21),
+                                                                                                                                                                (22, '가을 수확 보조', '사과 선별/포장 지원', '2025-10-27 09:00:00', '2025-10-27 17:00:00', '2025-10-05 09:00:00', '2025-10-22 18:00:00', true, 18, '경기도 남양주시', 'http://example.com/image22.jpg', 22),
+                                                                                                                                                                (23, '생활돌봄 야간반', '퇴근 후 생활 지원(야간)', '2025-11-01 19:00:00', '2025-11-01 21:00:00', '2025-10-10 09:00:00', '2025-10-27 18:00:00', false, 6, '서울시 은평구', 'http://example.com/image23.jpg', 16),
+                                                                                                                                                                (24, '응급처치 이론반', '기출 중심 이론 정리', '2025-11-04 19:30:00', '2025-11-04 21:00:00', '2025-10-12 09:00:00', '2025-10-30 18:00:00', true, 24, '서울시 마포구', 'http://example.com/image24.jpg', 18),
+                                                                                                                                                                (25, '다문화 음식 나눔전', '지역축제 부스 운영 지원', '2025-11-09 10:00:00', '2025-11-09 15:00:00', '2025-10-15 09:00:00', '2025-11-04 18:00:00', true, 20, '서울시 광진구', 'http://example.com/image25.jpg', 19);
 
--- Applicant
 INSERT INTO applicant (id, hours, status, user_id, activity_post_id) VALUES
                                                                          (1, 2.00, 'APPROVED', 1, 1), (2, 2.00, 'PENDING', 2, 1), (3, 2.00, 'APPROVED', 2, 2),
                                                                          (4, 2.00, 'APPROVED', 3, 3), (5, 2.00, 'REJECTED', 4, 3), (6, 2.00, 'APPROVED', 5, 4),
@@ -118,17 +129,37 @@ INSERT INTO applicant (id, hours, status, user_id, activity_post_id) VALUES
                                                                          (30, 2.00, 'APPROVED', 29, 14),
                                                                          (31, 3.00, 'APPROVED', 30, 15),
                                                                          (32, 2.00, 'PENDING', 5, 6),
-                                                                         (33, 2.00, 'REJECTED', 8, 7);
+                                                                         (33, 2.00, 'REJECTED', 8, 7),
+                                                                         (34, 2.00, 'APPROVED', 1, 16),
+                                                                         (35, 3.00, 'PENDING', 1, 17),
+                                                                         (36, 2.00, 'REJECTED', 1, 18),
+                                                                         (37, 3.00, 'APPROVED', 1, 19),
+                                                                         (38, 2.00, 'PENDING', 1, 20),
+                                                                         (39, 4.00, 'APPROVED', 1, 21),
+                                                                         (40, 4.00, 'PENDING', 1, 22),
+                                                                         (41, 2.00, 'REJECTED', 1, 23),
+                                                                         (42, 2.00, 'APPROVED', 1, 24),
+                                                                         (43, 3.00, 'PENDING', 1, 25),
+                                                                         (44, 2.00, 'APPROVED', 11, 16),
+                                                                         (45, 2.00, 'PENDING', 12, 17),
+                                                                         (46, 2.50, 'APPROVED', 13, 18),
+                                                                         (47, 3.00, 'PENDING', 14, 19),
+                                                                         (48, 2.00, 'REJECTED', 15, 20),
+                                                                         (49, 3.00, 'APPROVED', 16, 21),
+                                                                         (50, 2.00, 'PENDING', 17, 22),
+                                                                         (51, 3.00, 'APPROVED', 18, 24),
+                                                                         (52, 2.00, 'PENDING', 19, 25);
 
--- Likes
 INSERT INTO likes (id, user_id, activity_post_id) VALUES
                                                       (1, 1, 2), (2, 2, 1), (3, 3, 4), (4, 4, 5), (5, 5, 3),
                                                       (6, 6, 1), (7, 7, 2), (8, 8, 5), (9, 9, 4), (10, 10, 1),(11, 11, 6), (12, 12, 7), (13, 13, 8), (14, 14, 9), (15, 15, 10),
                                                       (16, 16, 11), (17, 17, 12), (18, 18, 13), (19, 19, 14), (20, 20, 15),
                                                       (21, 21, 6), (22, 22, 7), (23, 23, 8), (24, 24, 9), (25, 25, 10),
-                                                      (26, 26, 11), (27, 27, 12), (28, 28, 13), (29, 29, 14), (30, 30, 15);
+                                                      (26, 26, 11), (27, 27, 12), (28, 28, 13), (29, 29, 14), (30, 30, 15),
+                                                      (31, 1, 16), (32, 1, 17), (33, 1, 18), (34, 1, 19), (35, 1, 20),
+                                                      (36, 1, 21), (37, 1, 22), (38, 1, 24), (39, 1, 25),
+                                                      (40, 12, 16), (41, 13, 17), (42, 14, 18), (43, 15, 19), (44, 16, 20);
 
--- ActivityReview
 INSERT INTO activity_review (id, rate, content, image_url, activity_id, user_id) VALUES
                                                                                      (1, 5, '정말 보람있는 시간이었습니다.', 'http://example.com/review1.jpg', 1, 1),
                                                                                      (2, 4, '아이들이 똑똑해서 가르치는 재미가 있었어요.', 'http://example.com/review2.jpg', 2, 2),
@@ -144,9 +175,15 @@ INSERT INTO activity_review (id, rate, content, image_url, activity_id, user_id)
                                                                                      (12, 4, '농촌 봉사가 뿌듯했습니다.', 'http://example.com/review12.jpg', 12, 17),
                                                                                      (13, 5, '반찬 포장이 뜻깊었습니다.', 'http://example.com/review13.jpg', 13, 18),
                                                                                      (14, 4, '멘토링하며 보람을 느꼈습니다.', 'http://example.com/review14.jpg', 14, 19),
-                                                                                     (15, 5, '플로깅으로 환경 보호에 기여했습니다.', 'http://example.com/review15.jpg', 15, 20);
+                                                                                     (15, 5, '플로깅으로 환경 보호에 기여했습니다.', 'http://example.com/review15.jpg', 15, 20),
+                                                                                     (16, 5, '방문 돌봄에서 보람을 느꼈습니다.', 'http://example.com/review16.jpg', 16, 1),
+                                                                                     (17, 4, '파이썬 기본기 다지기에 좋아요.', 'http://example.com/review17.jpg', 17, 1),
+                                                                                     (18, 5, '심폐소생술 실습이 큰 도움이 됐습니다.', 'http://example.com/review18.jpg', 18, 1),
+                                                                                     (19, 5, '음식으로 소통할 수 있어 의미 있었습니다.', 'http://example.com/review19.jpg', 19, 1),
+                                                                                     (20, 4, '하천이 눈에 띄게 깨끗해졌어요.', 'http://example.com/review20.jpg', 20, 1),
+                                                                                     (21, 4, '민원 안내 동선이 잘 짜여 있었어요.', 'http://example.com/review21.jpg', 21, 12),
+                                                                                     (22, 5, '농가에서 감사해하셔서 뿌듯했습니다.', 'http://example.com/review22.jpg', 22, 13);
 
--- UserReview
 INSERT INTO user_review (id, health_status, diligence_level, attitude, memo, user_id,write_inst) VALUES
                                                                                                      (1, 5, 5, 5, '성실하고 착한 봉사자입니다.', 1,1), (2, 4, 4, 4, '열정적인 모습이 보기 좋았습니다.', 2,1),
                                                                                                      (3, 5, 4, 5, '시간 약속을 잘 지킵니다.', 3,1), (4, 3, 4, 3, '조금 더 적극적으로 참여했으면 좋겠습니다.', 4,1),
@@ -171,9 +208,9 @@ INSERT INTO user_review (id, health_status, diligence_level, attitude, memo, use
                                                                                                      (27, 5, 5, 4, '시간 약속을 잘 지킵니다.', 27, 4),
                                                                                                      (28, 4, 5, 4, '책임감이 강합니다.', 28, 6),
                                                                                                      (29, 5, 4, 5, '친화력이 좋습니다.', 29, 8),
-                                                                                                     (30, 4, 4, 4, '묵묵히 자기 역할을 합니다.', 30, 9);
+                                                                                                     (30, 4, 4, 4, '묵묵히 자기 역할을 합니다.', 30, 9),
+                                                                                                     (31, 5, 5, 5, '기관 5 평가: 일정 준수, 친화력 우수, 업무 이해도 뛰어남.', 1, 5);
 
--- Certification
 INSERT INTO certification (id, hour, user_id) VALUES
                                                   (1, 10, 1), (2, 20, 2), (3, 5, 3), (4, 30, 4), (5, 15, 5),
                                                   (6, 25, 6), (7, 8, 7), (8, 12, 8), (9, 18, 9), (10, 22, 10),(11, 14, 11), (12, 9, 12), (13, 16, 13), (14, 28, 14), (15, 6, 15),
@@ -181,7 +218,6 @@ INSERT INTO certification (id, hour, user_id) VALUES
                                                   (21, 13, 21), (22, 8, 22), (23, 17, 23), (24, 26, 24), (25, 10, 25),
                                                   (26, 21, 26), (27, 15, 27), (28, 12, 28), (29, 23, 29), (30, 16, 30);
 
--- SupportRequest
 INSERT INTO support_request (id, supply, detail, status, activity_post_id) VALUES
                                                                                (1, '간식', '어르신들께 드릴 간식이 필요합니다.', 'APPROVED', 1),
                                                                                (2, '노트북', '교육용 노트북이 부족합니다.', 'PENDING', 2),
@@ -197,4 +233,14 @@ INSERT INTO support_request (id, supply, detail, status, activity_post_id) VALUE
                                                                                (12, '모자', '농작업 시 필요한 모자가 필요합니다.', 'APPROVED', 12),
                                                                                (13, '보냉백', '반찬 배달 보냉백이 필요합니다.', 'PENDING', 13),
                                                                                (14, '화이트보드', '멘토링용 화이트보드가 필요합니다.', 'APPROVED', 14),
-                                                                               (15, '집게봉', '플로깅용 집게봉이 필요합니다.', 'PENDING', 15);
+                                                                               (15, '집게봉', '플로깅용 집게봉이 필요합니다.', 'PENDING', 15),
+                                                                               (16, '간식', '돌봄 봉사 이동 간 간식 필요', 'APPROVED', 16),
+                                                                               (17, '노트북', '코딩 특강용 대여 노트북 5대 필요', 'PENDING', 17),
+                                                                               (18, '마네킹', '심폐소생술 실습용 마네킹 3기 추가 요청', 'APPROVED', 18),
+                                                                               (19, '재료비', '다문화 요리 재료 구입비 지원 요청', 'PENDING', 19),
+                                                                               (20, '장갑', '플로깅용 장갑/집게 추가 필요', 'APPROVED', 20),
+                                                                               (21, '리플렛', '민원 안내 동선 리플렛 인쇄', 'PENDING', 21),
+                                                                               (22, '모자', '농작업용 모자/생수 요청', 'APPROVED', 22),
+                                                                               (23, '야광띠', '야간 돌봄 이동 시 안전용 야광띠', 'PENDING', 23),
+                                                                               (24, '프로젝터', '이론 강의용 프로젝터 필요', 'APPROVED', 24),
+                                                                               (25, '부스물품', '축제 부스 배너/테이블보/일회용품', 'APPROVED', 25);
