@@ -29,7 +29,7 @@ public class CertificationService {
 
         List<Certification> certifications = certificationRepository.findAllByUser(user);
         return certifications.stream()
-                .map(CertificationResponseDTO::from)
+                .map((certification)-> CertificationResponseDTO.from(certification, user.getName()))
                 .collect(Collectors.toList());
     }
 
@@ -44,6 +44,6 @@ public class CertificationService {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_CERTIFICATION_ACCESS_DENIED);
         }
 
-        return CertificationResponseDTO.from(certification);
+        return CertificationResponseDTO.from(certification, user.getName());
     }
 }
