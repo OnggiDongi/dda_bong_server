@@ -39,10 +39,32 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 
-    public UserResponseDTO findUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
-        return toDTO(user);
+    public UserResponseDTO findUserByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+		String grade = user.getTotalHour() < 111 ? "SILVER" : "VIP";
+
+		return UserResponseDTO.builder()
+			.id(user.getId())
+			.name(user.getName())
+			.email(user.getEmail())
+			.phoneNumber(user.getPhoneNumber())
+			.totalHour(user.getTotalHour())
+			.birthdate(user.getBirthdate())
+			.preferredRegion(user.getPreferredRegion()!= null
+				? user.getPreferredRegion()
+				: null
+					)
+			.profileImage(user.getProfileImage()!= null
+				? user.getProfileImage()
+				: "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/7edb4d83-5813-4032-8292-e9f73c086474-(Frame 2087326976.png)"
+					)
+			.preferredCategory(user.getPreferredCategory()!= null
+				? user.getPreferredCategory().getDescription()
+				: null
+					)
+			.grade(grade)
+			.build();
     }
 
     @Transactional

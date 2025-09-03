@@ -40,10 +40,35 @@ public class UserController {
 
     private final UserService userService;
 
-	@GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findUserById(id));
+	@Tag(name = "내 정보 조회")
+	@Operation(summary = "유저의 이메일로 유저 정보(이름, 전화번호, 생년월일, 프로필 사진, 선호지역/카테고리 , 등급) 조회")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보를 성공적으로 조회했습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+		@ApiResponse(responseCode = "404",
+			description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+	@GetMapping
+	public ResponseEntity<UserResponseDTO> getUserByEmail(Authentication authentication) {
+		String email = authentication.getName();
+        return ResponseEntity.ok(userService.findUserByEmail(email));
     }
+
+
+	@Operation(summary = "내 정보 조회", description = "로그인한 사용자의 이메일로 전체 정보를 조회합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보를 성공적으로 조회했습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+	@GetMapping("/me")
+	public ResponseEntity<UserResponseDTO> getMyInfo(Authentication authentication) {
+		String email = authentication.getName();
+		return ResponseEntity.ok(userService.findUserByEmail(email));
+	}
+
 
     @PostMapping("/onboarding")
     public ResponseEntity<?> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {

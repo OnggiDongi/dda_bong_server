@@ -59,7 +59,7 @@ INSERT INTO activity (id, title, content, category, institution) VALUES
                                                                      (9, '교통 질서 캠페인', '시민들에게 교통 질서의 중요성을 알립니다.', 'SAFETY', 9),
                                                                      (10, '외국인 한국어 교실', '외국인 주민들에게 한국어를 가르칩니다.', 'CULTURE', 10),
                                                                      (11, '민원 안내 지원', '주민센터에서 민원 안내를 지원합니다.', 'PUBLIC', 11),
-                                                                     (12, '농촌 일손 돕기', '농번기 농촌 지역에서 일손을 돕습니다.', 'GLOBAL', 12),
+                                                                     (12, '농촌 일손 돕기', '농번기 농촌 지역에서 일손을 돕습니다.', 'RURALAREA', 12),
                                                                      (13, '어르신 반찬 만들기', '어르신들을 위한 반찬을 조리합니다.', 'LIVING', 13),
                                                                      (14, '방과후 수학 멘토링', '청소년 수학 멘토링 프로그램입니다.', 'EDUCATION', 14),
                                                                      (15, '하천 정화 활동', '하천 주변 쓰레기를 수거합니다.', 'ENVIRONMENT', 15),
@@ -69,7 +69,7 @@ INSERT INTO activity (id, title, content, category, institution) VALUES
                                                                      (19, '다문화 요리 교실', '다문화 가정과 함께하는 요리 체험', 'CULTURE', 5),
                                                                      (20, '도심 하천 정화', '하천변 쓰레기 수거 및 분리', 'ENVIRONMENT', 5),
                                                                      (21, '민원 안내 서포터즈', '행정복지센터 민원 안내 지원', 'PUBLIC', 5),
-                                                                     (22, '농가 일손 돕기(가을)', '수확철 농가 작황 보조', 'GLOBAL', 5);
+                                                                     (22, '농가 일손 돕기(가을)', '수확철 농가 작황 보조', 'RURALAREA', 5);
 
 INSERT INTO activity_post (id, title, content, start_at, end_at, recruitment_start, recruitment_end, is_accept, capacity, location, image_url, activity_id) VALUES
                                                                                                                                                                 (1, '독거노인 방문 봉사', '독거노인 분들을 방문하여 악어새가 되어드립니다.', '2025-09-01 10:00:00', '2025-09-01 12:00:00', '2025-08-20 09:00:00', '2025-08-31 18:00:00', true, 10, '서울시 강남구', 'https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/%E1%84%8E%E1%85%A9%E1%84%89%E1%85%AE%E1%84%87%E1%85%B5.jpg', 1),
