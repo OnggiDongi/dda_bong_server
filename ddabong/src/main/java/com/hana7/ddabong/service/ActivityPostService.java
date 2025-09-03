@@ -67,7 +67,7 @@ public class ActivityPostService {
 			String imageUrl;
 
 			if(dto.getImage() == null) {
-				imageUrl = "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)"
+				imageUrl = "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)";
 			} else {
 				imageUrl = s3Service.uploadFile(dto.getImage());
 			}
