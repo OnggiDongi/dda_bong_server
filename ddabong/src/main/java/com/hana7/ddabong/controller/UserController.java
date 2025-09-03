@@ -14,7 +14,6 @@ import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.UserService;
-import com.hana7.ddabong.service.UserSummaryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
-	private final UserSummaryService userSummaryService;
 
 	@GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
@@ -106,6 +104,6 @@ public class UserController {
 	@GetMapping("/summary")
 	public ResponseEntity<UserSummaryResponseDTO> getUserSummaryByEmail(Authentication authentication) {
 		String email = authentication.getName();
-		return ResponseEntity.ok(userSummaryService.findUserSummaryByEmail(email));
+		return ResponseEntity.ok(userService.findUserSummaryByEmail(email));
 	}
 }
