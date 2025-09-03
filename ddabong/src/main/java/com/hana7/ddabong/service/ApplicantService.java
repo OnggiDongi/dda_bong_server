@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -117,6 +118,9 @@ public class ApplicantService {
 		ActivityPost activityPost = activityPostRepository.findById(activityPostId)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
+		if (!Objects.equals(institution.getId(), activityPost.getActivity().getInstitution().getId())){
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
+		}
 
 		List<Applicant> applicants = applicantRepository.findByActivityPostIdAndDeletedAtIsNull(activityPostId);
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
@@ -136,7 +140,7 @@ public class ApplicantService {
 							.diligenceLevel(formatAverage(avgDiligence))
 							.healthStatus(formatAverage(avgHealth))
 							.attitude(formatAverage(avgAttitude))
-							.status(applicant.getStatus().getDescription())
+							.status(applicant.getStatus().toString())
 							.profileImage(user.getProfileImage())
 							.build();
 				}
@@ -189,6 +193,7 @@ public class ApplicantService {
 	}
 
 	private List<UserReviewResponseDTO> toReviewDto(List<UserReview> userReviews){
+		System.out.println("userReviews = " + userReviews);
 		return userReviews.stream()
 				.map(review -> {
 

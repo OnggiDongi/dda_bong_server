@@ -159,8 +159,8 @@ public class ActivityPostController {
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
 	})
 	@GetMapping("/myposts")
-	public ResponseEntity<List<ActivityPostResponseDTO>> getActivityPost(Authentication authentication) {
-		List<ActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName());
+	public ResponseEntity<List<ActivityPostResponseDTO>> getActivityPost(@RequestParam(required = false, defaultValue = "true") boolean isRecruting, Authentication authentication) {
+		List<ActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName(), isRecruting);
 		return ResponseEntity.ok(getMyActivityPosts);
 	}
 
@@ -181,7 +181,7 @@ public class ActivityPostController {
 	@Tag(name = "봉사 지원자 목록 확인하기")
 	@Operation(summary = "기관은 자신이 등록한 봉사 모집글에 봉사 신청한 지원자 목록을 확인할 수 있다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "해당 봉사 모집글에 지원한 지원자 목록입니다.", content = @Content(mediaType = "application/json")),
+		@ApiResponse(responseCode = "200", description = "해당 봉사 모집글에 지원한 지원자 목록입니다.", content = @Content(mediaType = "application/json", schema =  @Schema(implementation = ApplicantListDTO.class))),
 		@ApiResponse(responseCode = "404",
 			description = "해당하는 기관 | 봉사 모집글이 존재하지 않습니다.",
 			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),

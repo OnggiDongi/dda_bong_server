@@ -273,7 +273,7 @@ public class ActivityPostService {
 		applicantRepository.save(applicant);
 	}
 
-	public List<ActivityPostResponseDTO> getMyActivityPosts(String email) {
+	public List<ActivityPostResponseDTO> getMyActivityPosts(String email, boolean isRecruting) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -283,7 +283,13 @@ public class ActivityPostService {
 		activities.forEach(
 				activity ->
 				{
-					List<ActivityPostResponseDTO> list = activity.getActivityPosts().stream()
+					List<ActivityPost> posts;
+					if (isRecruting) {
+						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfter(activity.getId(), LocalDateTime.now());
+					} else {
+						posts = activityPostRepository.findByActivity_IdAndEndAtBefore(activity.getId(), LocalDateTime.now());
+					}
+					List<ActivityPostResponseDTO> list = posts.stream()
 							.map(post -> {
 								// 지원자 총 인원 수
 								long applicants = post.getApplicants().stream()
