@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -56,13 +57,17 @@ public class ActivityPostService {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-			LocalDateTime startAt = LocalDateTime.parse(dto.getStartAt(), formatter);
-			LocalDateTime recruitmentEnd = LocalDateTime.parse(dto.getRecruitmentEnd(), formatter);
+			LocalDateTime startAt = OffsetDateTime.parse(dto.getStartAt()).toLocalDateTime();
+			LocalDateTime recruitmentEnd = OffsetDateTime.parse(dto.getRecruitmentEnd()).toLocalDateTime();
+
 
 			String[] parts = dto.getActivityTime().split(":");
+
 			int hours = Integer.parseInt(parts[0]);
 			int minutes = Integer.parseInt(parts[1]);
+
 			LocalDateTime endAt = startAt.plusHours(hours).plusMinutes(minutes);
+
 
 			String imageUrl;
 
