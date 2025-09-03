@@ -55,21 +55,6 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserByEmail(email));
     }
 
-
-	@Operation(summary = "내 정보 조회", description = "로그인한 사용자의 이메일로 전체 정보를 조회합니다.")
-	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "유저 정보를 성공적으로 조회했습니다.",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
-		@ApiResponse(responseCode = "404", description = "해당하는 유저가 존재하지 않습니다.",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
-	})
-	@GetMapping("/me")
-	public ResponseEntity<UserResponseDTO> getMyInfo(Authentication authentication) {
-		String email = authentication.getName();
-		return ResponseEntity.ok(userService.findUserByEmail(email));
-	}
-
-
     @PostMapping("/onboarding")
     public ResponseEntity<?> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {
 		userService.updateOnboardingInfo(authentication.getName(), userOnboardingRequestDTO);
