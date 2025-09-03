@@ -89,7 +89,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
+
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
 			ObjectMapper objectMapper = new ObjectMapper();
 			PrintWriter out = response.getWriter();
 			out.println(objectMapper.writeValueAsString(Map.of("error", "ERROR_ACCESS_TOKEN")));

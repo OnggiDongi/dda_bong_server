@@ -23,7 +23,7 @@ public class UserResponseDTO {
     private LocalDate birthdate;
     private String preferredRegion;
     private String profileImage;
-    private List<String> preferredCategory;
+    private String preferredCategory;
     private String grade;
     
 }

@@ -94,16 +94,12 @@ public class ApplicantService {
 				.mapToInt(UserReviewResponseDTO::getAttitude)
 				.average().orElse(0);
 
-		List<String> strCategories = user.getPreferredCategory().stream()
-				.map(Category::getDescription)
-				.toList();
-
 		return ApplicantDetailResponseDTO.builder()
 				.userName(user.getName())
 				.birthDate(formatDate(user.getBirthdate()))
 				.phoneNumber(user.getPhoneNumber())
 				.profileImage(user.getProfileImage())
-				.preferredCategory(strCategories)
+				.preferredCategory(user.getPreferredCategory().getDescription())
 //							.reviewSummary("") // TODO : AI 붙이면 넣기
 				.totalGrade(formatAverage(totalRate))
 				.healthStatus(formatAverage(totalHealthStatus))

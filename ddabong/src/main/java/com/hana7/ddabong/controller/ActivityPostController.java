@@ -97,7 +97,7 @@ public class ActivityPostController {
 	@Tag(name = "봉사 모집글 상세보기")
 	@Operation(summary = "기관이 작성한 봉사 모집글에 대한 상세정보를 확인할 수 있다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ActivityPostDetailResponseDTO.class))),
 			@ApiResponse(responseCode = "404",
 					description = "해당하는 봉사 모집글이 존재하지 않습니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))

@@ -46,12 +46,6 @@ INSERT INTO user (id, name, email, password, phone_number, total_hour, birthdate
                                                                                                                   (29, '달봉사', 'moon2@ddabong.com', '1234', '010-2728-2728', 22, '1992-02-02', false, '제주'),
                                                                                                                   (30, '구름봉사', 'cloud@ddabong.com', '1234', '010-2829-2829', 16, '1997-07-21', true, '서울');
 
-INSERT INTO user_preferred_category (user_id, preferred_category) VALUES
-                                                                      (1, 'LIVING'), (1, 'EDUCATION'), (2, 'SAFETY'), (3, 'CULTURE'), (4, 'ENVIRONMENT'),
-                                                                      (5, 'PUBLIC'), (6, 'GLOBAL'), (7, 'LIVING'), (8, 'EDUCATION'), (9, 'SAFETY'), (10, 'CULTURE'),(11, 'ENVIRONMENT'), (12, 'PUBLIC'), (13, 'GLOBAL'), (14, 'CULTURE'), (15, 'SAFETY'),
-                                                                      (16, 'LIVING'), (17, 'EDUCATION'), (18, 'SAFETY'), (19, 'CULTURE'), (20, 'ENVIRONMENT'),
-                                                                      (21, 'PUBLIC'), (22, 'GLOBAL'), (23, 'LIVING'), (24, 'EDUCATION'), (25, 'SAFETY'),
-                                                                      (26, 'CULTURE'), (27, 'ENVIRONMENT'), (28, 'PUBLIC'), (29, 'GLOBAL'), (30, 'LIVING');
 
 INSERT INTO activity (id, title, content, category, institution) VALUES
                                                                      (1, '독거노인 생활 지원', '독거노인 분들의 양치를 시켜드려요.', 'LIVING', 1),

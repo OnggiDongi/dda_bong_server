@@ -23,6 +23,8 @@ public class ActivityPostResponseDTO {
     private String imageUrl;
     private Category category;
     private String dDay;
+
+    @Builder.Default
     private int applicantNum = 0;
 
     public static ActivityPostResponseDTO of(ActivityPost activityPost) {

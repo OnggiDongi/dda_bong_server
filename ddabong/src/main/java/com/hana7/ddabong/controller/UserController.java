@@ -46,8 +46,9 @@ public class UserController {
     }
 
     @PostMapping("/onboarding")
-    public ResponseEntity<UserResponseDTO> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {
-        return ResponseEntity.ok(userService.updateOnboardingInfo(authentication.getName(), userOnboardingRequestDTO));
+    public ResponseEntity<?> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {
+		userService.updateOnboardingInfo(authentication.getName(), userOnboardingRequestDTO);
+		return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/update")

@@ -9,6 +9,7 @@ import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.entity.Likes;
 import com.hana7.ddabong.entity.User;
+import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
@@ -45,18 +46,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateOnboardingInfo(String email, UserOnboardingRequestDTO userOnboardingRequestDTO) {
+    public void updateOnboardingInfo(String email, UserOnboardingRequestDTO userOnboardingRequestDTO) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         user = user.toBuilder()
                 .preferredRegion(userOnboardingRequestDTO.getPreferredRegion())
-                .preferredCategory(userOnboardingRequestDTO.getPreferredCategory())
+                .preferredCategory(Category.fromDescription(userOnboardingRequestDTO.getPreferredCategory()))
                 .build();
 
         userRepository.save(user);
-
-        return toDTO(user);
     }
 
     @Transactional
@@ -110,9 +109,7 @@ public class UserService {
                 .birthdate(user.getBirthdate())
                 .preferredRegion(user.getPreferredRegion())
                 .profileImage(user.getProfileImage())
-                .preferredCategory(user.getPreferredCategory().stream()
-                        .map(Enum::name)
-                        .collect(Collectors.toList()))
+                .preferredCategory(user.getPreferredCategory().getDescription())
 				.grade(grade)
                 .build();
     }

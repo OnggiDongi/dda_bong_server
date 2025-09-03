@@ -12,8 +12,9 @@ public class ApplicantDetailResponseDTO {
 	private String birthDate;
 	private String phoneNumber;
 	private String profileImage;
-	private List<String> preferredCategory;
+	private String preferredCategory;
 
+	@Builder.Default
 	private String reviewSummary = "";
 
 	private double totalGrade;

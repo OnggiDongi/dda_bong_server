@@ -38,7 +38,7 @@ public class MemberServiceImpl  implements UserDetailsService {
 			}
 		} else {
 			System.out.println("user = " + user);
-			if(user.getPreferredCategory().isEmpty() && user.getPreferredRegion().isEmpty()){
+			if(user.getPreferredCategory() == null && user.getPreferredRegion() == null){
 				return new MemberDTO(user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name(), true);
 			}
 			return new MemberDTO(user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name(), false);
