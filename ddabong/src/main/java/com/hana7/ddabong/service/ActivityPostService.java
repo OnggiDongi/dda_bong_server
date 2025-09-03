@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -56,22 +57,33 @@ public class ActivityPostService {
 		try {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-			LocalDateTime startAt = LocalDateTime.parse(dto.getStartAt(), formatter);
-			LocalDateTime recruitmentEnd = LocalDateTime.parse(dto.getRecruitmentEnd(), formatter);
+			LocalDateTime startAt = OffsetDateTime.parse(dto.getStartAt()).toLocalDateTime();
+			LocalDateTime recruitmentEnd = OffsetDateTime.parse(dto.getRecruitmentEnd()).toLocalDateTime();
+
+			System.out.println("startAt = " + startAt);
+			System.out.println("recruitmentEnd = " + recruitmentEnd);
 
 			String[] parts = dto.getActivityTime().split(":");
+
 			int hours = Integer.parseInt(parts[0]);
 			int minutes = Integer.parseInt(parts[1]);
+			System.out.println("hours = " + hours);
+			System.out.println("minutes = " + minutes);
 			LocalDateTime endAt = startAt.plusHours(hours).plusMinutes(minutes);
+
+			System.out.println("endAt = " + endAt);
 
 			String imageUrl;
 
 			if(dto.getImage() == null) {
 				imageUrl = "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)";
 			} else {
+				System.out.println("2");
 				imageUrl = s3Service.uploadFile(dto.getImage());
+				System.out.println("imageUrl = " + imageUrl);
 			}
 
+			System.out.println("3");
 			activityPostRepository.save(dto.toEntity(imageUrl, startAt, endAt, recruitmentEnd, activity));
 		} catch (Exception e) {
 			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
