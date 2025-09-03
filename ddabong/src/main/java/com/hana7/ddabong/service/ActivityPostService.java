@@ -64,8 +64,15 @@ public class ActivityPostService {
 			int minutes = Integer.parseInt(parts[1]);
 			LocalDateTime endAt = startAt.plusHours(hours).plusMinutes(minutes);
 
-			String fileUrl = s3Service.uploadFile(dto.getImage());
-			activityPostRepository.save(dto.toEntity(fileUrl, startAt, endAt, recruitmentEnd, activity));
+			String imageUrl;
+
+			if(dto.getImage() == null) {
+				imageUrl = "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)"
+			} else {
+				imageUrl = s3Service.uploadFile(dto.getImage());
+			}
+
+			activityPostRepository.save(dto.toEntity(imageUrl, startAt, endAt, recruitmentEnd, activity));
 		} catch (Exception e) {
 			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
 		}

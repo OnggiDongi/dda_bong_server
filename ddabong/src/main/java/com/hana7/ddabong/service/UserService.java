@@ -138,6 +138,7 @@ public class UserService {
 					.name(userRequestDTO.getName())
 					.phoneNumber(userRequestDTO.getPhoneNumber())
 					.birthdate(birthDate)
+					.profileImage("https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/7edb4d83-5813-4032-8292-e9f73c086474-(Frame 2087326976.png)")
 					.isKakao(false)
 					.build();
 
