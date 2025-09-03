@@ -4,6 +4,7 @@ import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
+import com.hana7.ddabong.dto.UserSummaryResponseDTO;
 import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.entity.Likes;
@@ -149,5 +150,19 @@ public class UserService {
 
 		// 이미 있는 회원일 경우
 		throw new ConflictException(ErrorCode.CONFLICT_USER);
+	}
+
+	@Transactional
+	public UserSummaryResponseDTO findUserSummaryByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+		String grade = user.getTotalHour() < 111 ? "SILVER" : "VIP";
+
+		return UserSummaryResponseDTO.builder()
+			.name(user.getName())
+			.grade(grade)
+			.totalHour(user.getTotalHour())
+			.build();
 	}
 }
