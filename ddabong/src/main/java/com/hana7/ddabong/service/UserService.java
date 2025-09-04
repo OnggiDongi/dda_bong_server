@@ -86,40 +86,30 @@ public class UserService {
 		User user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
-		if (hasText(userUpdateRequestDTO.getPassword())) {
-			user.setPassword(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
-		}
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		User updated = user.toBuilder()
+				.password(userUpdateRequestDTO.getPassword() != null
+						? passwordEncoder.encode(userUpdateRequestDTO.getPassword())
+						: user.getPassword())
+				.phoneNumber(userUpdateRequestDTO.getPhoneNumber() != null
+						? userUpdateRequestDTO.getPhoneNumber()
+						: user.getPhoneNumber())
+				.birthdate(userUpdateRequestDTO.getBirthDate() != null
+						? LocalDate.parse(userUpdateRequestDTO.getBirthDate(), fmt)
+						: user.getBirthdate())
+				.profileImage(userUpdateRequestDTO.getProfileImage() != null
+						? userUpdateRequestDTO.getProfileImage()
+						: user.getProfileImage())
+				.preferredRegion(userUpdateRequestDTO.getPreferredRegion() != null
+						? userUpdateRequestDTO.getPreferredRegion()
+						: null)
+				.preferredCategory(userUpdateRequestDTO.getPreferredCategory() != null
+						? Category.fromDescription(userUpdateRequestDTO.getPreferredCategory())
+						: null)
+				.build();
 
-		if (hasText(userUpdateRequestDTO.getPhoneNumber())) {
-			user.setPhoneNumber(userUpdateRequestDTO.getPhoneNumber());
-		}
-
-		if (hasText(userUpdateRequestDTO.getBirthDate())) {
-			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-			LocalDate birth = LocalDate.parse(userUpdateRequestDTO.getBirthDate(), fmt);
-			user.setBirthdate(birth);
-		}
-
-		if (hasText(userUpdateRequestDTO.getProfileImage())) {
-			user.setProfileImage(userUpdateRequestDTO.getProfileImage());
-		}
-
-		if (hasText(userUpdateRequestDTO.getPreferredRegion())) {
-			user.setPreferredRegion(userUpdateRequestDTO.getPreferredRegion());
-		} else {
-			user.setPreferredRegion(null);
-		}
-
-		if (hasText(userUpdateRequestDTO.getPreferredCategory())) {
-
-			Category cat = Category.fromDescription(userUpdateRequestDTO.getPreferredCategory());
-			user.setPreferredCategory(cat);
-		} else {
-			user.setPreferredCategory(null);
-		}
-
-		userRepository.save(user);
-		return toDTO(user);
+		userRepository.save(updated);
+		return toDTO(updated);
 	}
 
 	private boolean hasText(String s) {
