@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,23 +81,50 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional
-    public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+	@Transactional
+	public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
-		String encodedPassword = passwordEncoder.encode(userUpdateRequestDTO.getPassword());
+		if (hasText(userUpdateRequestDTO.getPassword())) {
+			user.setPassword(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
+		}
 
-        User updatedUser = user.toBuilder()
-            .name(userUpdateRequestDTO.getName())
-            .phoneNumber(userUpdateRequestDTO.getPhoneNumber())
-            .password(encodedPassword)
-            .build();
+		if (hasText(userUpdateRequestDTO.getPhoneNumber())) {
+			user.setPhoneNumber(userUpdateRequestDTO.getPhoneNumber());
+		}
 
-        userRepository.save(updatedUser);
+		if (hasText(userUpdateRequestDTO.getBirthDate())) {
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+			LocalDate birth = LocalDate.parse(userUpdateRequestDTO.getBirthDate(), fmt);
+			user.setBirthdate(birth);
+		}
 
-        return toDTO(updatedUser);
-    }
+		if (hasText(userUpdateRequestDTO.getProfileImage())) {
+			user.setProfileImage(userUpdateRequestDTO.getProfileImage());
+		}
+
+		if (hasText(userUpdateRequestDTO.getPreferredRegion())) {
+			user.setPreferredRegion(userUpdateRequestDTO.getPreferredRegion());
+		} else {
+			user.setPreferredRegion(null);
+		}
+
+		if (hasText(userUpdateRequestDTO.getPreferredCategory())) {
+
+			Category cat = Category.fromDescription(userUpdateRequestDTO.getPreferredCategory());
+			user.setPreferredCategory(cat);
+		} else {
+			user.setPreferredCategory(null);
+		}
+
+		userRepository.save(user);
+		return toDTO(user);
+	}
+
+	private boolean hasText(String s) {
+		return s != null && !s.isBlank();
+	}
 
     public List<ActivityPostResponseDTO> findLikedActivities(String email) {
         User user = userRepository.findByEmail(email)
@@ -131,7 +159,10 @@ public class UserService {
                 .birthdate(user.getBirthdate())
                 .preferredRegion(user.getPreferredRegion())
                 .profileImage(user.getProfileImage())
-                .preferredCategory(user.getPreferredCategory().getDescription())
+				.preferredCategory(
+					user.getPreferredCategory() != null
+					? user.getPreferredCategory().getDescription()
+					: null)
 				.grade(grade)
                 .build();
     }

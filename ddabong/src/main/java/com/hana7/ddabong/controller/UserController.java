@@ -40,7 +40,7 @@ public class UserController {
 
     private final UserService userService;
 
-	@Tag(name = "내 정보 조회")
+	@Tag(name = "내 정보")
 	@Operation(summary = "유저의 이메일로 유저 정보(이름, 전화번호, 생년월일, 프로필 사진, 선호지역/카테고리 , 등급) 조회")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "유저 정보를 성공적으로 조회했습니다.",
@@ -61,6 +61,14 @@ public class UserController {
 		return ResponseEntity.ok().build();
     }
 
+	@Tag(name = "내 정보")
+	@Operation(summary = "유저는 자신의 이름, 전화번호, 생년월일, 프로필 사진, 선호지역/카테고리, 비밀번호를 수정할 수 있다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보 수정을 성공적으로 완료했습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
     @PatchMapping("/update")
     public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
         String email = authentication.getName();
