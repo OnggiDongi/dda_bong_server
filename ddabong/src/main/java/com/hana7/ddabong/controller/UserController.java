@@ -1,5 +1,6 @@
 package com.hana7.ddabong.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -69,8 +71,8 @@ public class UserController {
 		@ApiResponse(responseCode = "404", description = "해당하는 유저가 존재하지 않습니다.",
 			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
 	})
-    @PatchMapping("/update")
-    public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, UserUpdateRequestDTO userUpdateRequestDTO) throws IOException {
         String email = authentication.getName();
         return ResponseEntity.ok(userService.updateUser(email, userUpdateRequestDTO));
     }

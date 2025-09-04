@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -38,6 +39,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ApplicantRepository applicantRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final S3Service s3Service;
 
 
     public UserResponseDTO findUserByEmail(String email) {
@@ -82,11 +84,15 @@ public class UserService {
     }
 
 	@Transactional
-	public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
+	public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) throws IOException {
 		User user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		String fileUrl = (userUpdateRequestDTO.getProfileImage() != null && !userUpdateRequestDTO.getProfileImage().isEmpty())
+				? s3Service.uploadFile(userUpdateRequestDTO.getProfileImage())
+				: user.getProfileImage();
+
 		User updated = user.toBuilder()
 				.password(userUpdateRequestDTO.getPassword() != null
 						? passwordEncoder.encode(userUpdateRequestDTO.getPassword())
@@ -97,9 +103,7 @@ public class UserService {
 				.birthdate(userUpdateRequestDTO.getBirthDate() != null
 						? LocalDate.parse(userUpdateRequestDTO.getBirthDate(), fmt)
 						: user.getBirthdate())
-				.profileImage(userUpdateRequestDTO.getProfileImage() != null
-						? userUpdateRequestDTO.getProfileImage()
-						: user.getProfileImage())
+				.profileImage(fileUrl)
 				.preferredRegion(userUpdateRequestDTO.getPreferredRegion() != null
 						? userUpdateRequestDTO.getPreferredRegion()
 						: user.getPreferredRegion())
