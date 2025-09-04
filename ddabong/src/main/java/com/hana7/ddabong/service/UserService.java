@@ -112,10 +112,6 @@ public class UserService {
 		return toDTO(updated);
 	}
 
-	private boolean hasText(String s) {
-		return s != null && !s.isBlank();
-	}
-
     public List<ActivityPostResponseDTO> findLikedActivities(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
