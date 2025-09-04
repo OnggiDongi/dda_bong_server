@@ -51,7 +51,10 @@ public class UserService {
 			.email(user.getEmail())
 			.phoneNumber(user.getPhoneNumber())
 			.totalHour(user.getTotalHour())
-			.birthdate(user.getBirthdate())
+			.birthdate(String.format("%04d.%02d.%02d",
+				user.getBirthdate().getYear(),
+				user.getBirthdate().getMonthValue(),
+				user.getBirthdate().getDayOfMonth()))
 			.preferredRegion(user.getPreferredRegion()!= null
 				? user.getPreferredRegion()
 				: null
@@ -142,8 +145,11 @@ public class UserService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .totalHour(user.getTotalHour())
-                .birthdate(user.getBirthdate())
-                .preferredRegion(user.getPreferredRegion())
+				.birthdate(String.format("%04d.%02d.%02d",
+				user.getBirthdate().getYear(),
+				user.getBirthdate().getMonthValue(),
+				user.getBirthdate().getDayOfMonth()))
+				.preferredRegion(user.getPreferredRegion())
                 .profileImage(user.getProfileImage())
 				.preferredCategory(
 					user.getPreferredCategory() != null
