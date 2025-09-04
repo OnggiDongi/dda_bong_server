@@ -102,10 +102,10 @@ public class UserService {
 						: user.getProfileImage())
 				.preferredRegion(userUpdateRequestDTO.getPreferredRegion() != null
 						? userUpdateRequestDTO.getPreferredRegion()
-						: null)
+						: user.getPreferredRegion())
 				.preferredCategory(userUpdateRequestDTO.getPreferredCategory() != null
 						? Category.fromDescription(userUpdateRequestDTO.getPreferredCategory())
-						: null)
+						: user.getPreferredCategory())
 				.build();
 
 		userRepository.save(updated);
