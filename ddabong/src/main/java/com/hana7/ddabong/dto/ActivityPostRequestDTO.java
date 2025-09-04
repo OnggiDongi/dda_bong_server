@@ -11,6 +11,7 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -44,6 +45,8 @@ public class ActivityPostRequestDTO {
 
     private MultipartFile image;
 
+    private List<String> supports;
+
     public ActivityPost toEntity(
             String fileUrl,
             LocalDateTime startAt,
@@ -56,6 +59,7 @@ public class ActivityPostRequestDTO {
                 .content(content)
                 .startAt(startAt)
                 .endAt(endAt)
+                .recruitmentStart(LocalDateTime.now())
                 .recruitmentEnd(recruitmentEnd)
                 .capacity(capacity)
                 .location(location)

@@ -5,6 +5,7 @@ import com.hana7.ddabong.entity.*;
 import com.hana7.ddabong.enums.ApprovalStatus;
 import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
+import com.hana7.ddabong.enums.SupportRequestType;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
@@ -40,6 +41,7 @@ public class ActivityPostService {
 	private final InstitutionRepository institutionRepository;
 	private final ApplicantRepository applicantRepository;
 	private final ActivityPostCustomRepository activityPostCustomRepository;
+	private final SupportRequestRepository supportRequestRepository;
 
 	private final S3Service s3Service;
 
@@ -77,7 +79,24 @@ public class ActivityPostService {
 				imageUrl = s3Service.uploadFile(dto.getImage());
 			}
 
-			activityPostRepository.save(dto.toEntity(imageUrl, startAt, endAt, recruitmentEnd, activity));
+			ActivityPost save = activityPostRepository.save(dto.toEntity(imageUrl, startAt, endAt, recruitmentEnd, activity));
+			System.out.println("save = " + save);
+
+			System.out.println("dto.getSupports() = " + dto.getSupports().get(0));
+
+			dto.getSupports().stream()
+					.map(SupportRequestType::findByDescription)
+					.forEach((support)-> {
+						SupportRequest build = SupportRequest.builder()
+								.supply(support)
+								.activityPost(save)
+								.status(ApprovalStatus.PENDING)
+								.build();
+						System.out.println("build = " + build);
+						supportRequestRepository.save(build);
+					});
+
+
 		} catch (Exception e) {
 			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
 		}
