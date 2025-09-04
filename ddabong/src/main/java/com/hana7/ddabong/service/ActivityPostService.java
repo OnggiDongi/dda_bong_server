@@ -5,6 +5,7 @@ import com.hana7.ddabong.entity.*;
 import com.hana7.ddabong.enums.ApprovalStatus;
 import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
+import com.hana7.ddabong.enums.SupportRequestType;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
@@ -40,6 +41,7 @@ public class ActivityPostService {
 	private final InstitutionRepository institutionRepository;
 	private final ApplicantRepository applicantRepository;
 	private final ActivityPostCustomRepository activityPostCustomRepository;
+	private final SupportRequestRepository supportRequestRepository;
 
 	private final S3Service s3Service;
 
@@ -55,8 +57,6 @@ public class ActivityPostService {
 			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
 		}
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
 			LocalDateTime startAt = OffsetDateTime.parse(dto.getStartAt()).toLocalDateTime();
 			LocalDateTime recruitmentEnd = OffsetDateTime.parse(dto.getRecruitmentEnd()).toLocalDateTime();
 
@@ -77,7 +77,20 @@ public class ActivityPostService {
 				imageUrl = s3Service.uploadFile(dto.getImage());
 			}
 
-			activityPostRepository.save(dto.toEntity(imageUrl, startAt, endAt, recruitmentEnd, activity));
+			ActivityPost save = activityPostRepository.save(dto.toEntity(imageUrl, startAt, endAt, recruitmentEnd, activity));
+
+			dto.getSupports().stream()
+					.map(SupportRequestType::findByDescription)
+					.forEach((support)-> {
+						SupportRequest build = SupportRequest.builder()
+								.supply(support)
+								.activityPost(save)
+								.status(ApprovalStatus.PENDING)
+								.build();
+						supportRequestRepository.save(build);
+					});
+
+
 		} catch (Exception e) {
 			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
 		}
@@ -117,10 +130,8 @@ public class ActivityPostService {
 		}
 
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-			LocalDateTime startAt = LocalDateTime.parse(dto.getStartAt(), formatter);
-			LocalDateTime recruitmentEnd = LocalDateTime.parse(dto.getRecruitmentEnd(), formatter);
+			LocalDateTime startAt = OffsetDateTime.parse(dto.getStartAt()).toLocalDateTime();
+			LocalDateTime recruitmentEnd = OffsetDateTime.parse(dto.getRecruitmentEnd()).toLocalDateTime();
 
 			String[] parts = dto.getActivityTime().split(":");
 			int hours = Integer.parseInt(parts[0]);
@@ -131,7 +142,6 @@ public class ActivityPostService {
 					? s3Service.uploadFile(dto.getImage())
 					: post.getImageUrl();
 
-			System.out.println(post);
 			post = post.toBuilder()
 					.activity(activity)
 					.title(dto.getTitle())
@@ -144,7 +154,34 @@ public class ActivityPostService {
 					.imageUrl(fileUrl)
 					.build();
 
-			activityPostRepository.save(post);
+			ActivityPost save = activityPostRepository.save(post);
+
+			List<SupportRequest> oldSupports = supportRequestRepository.findByActivityPost_Id(save.getId());
+			List<SupportRequestType> oldTypes = oldSupports.stream()
+					.map(supportRequest -> supportRequest.getSupply())
+					.toList();
+			List<SupportRequestType> newSupport = dto.getSupports().stream()
+					.map(SupportRequestType::findByDescription)
+					.toList();
+
+			oldSupports.forEach(supportRequest -> {
+				if(!newSupport.contains(supportRequest.getSupply())) {
+					// 정보를 가지고 있을 이유가 없는 것 같아서 삭제합니다.
+					supportRequestRepository.delete(supportRequest);
+				}
+			});
+
+			newSupport.forEach(supportRequestType -> {
+				if(!oldTypes.contains(supportRequestType)) {
+					SupportRequest supportRequest = SupportRequest.builder()
+							.activityPost(save)
+							.status(ApprovalStatus.PENDING)
+							.supply(supportRequestType)
+							.build();
+
+					supportRequestRepository.save(supportRequest);
+				}
+			});
 		} catch (Exception e) {
 			throw new ConflictException(ErrorCode.CONFLICT_ACTIVITY_POST);
 		}
