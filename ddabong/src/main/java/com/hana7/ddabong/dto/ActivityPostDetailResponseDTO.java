@@ -46,6 +46,8 @@ public class ActivityPostDetailResponseDTO {
 
 	private double totalAvgScore;
 
+	private String aiComment;
+
 	private List<ActivityReviewResponseDTO> reviews;
 
 	private List<String> supports;

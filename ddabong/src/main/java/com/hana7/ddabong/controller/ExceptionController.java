@@ -8,6 +8,7 @@ import com.hana7.ddabong.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import com.hana7.ddabong.exception.GeminiApiException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -52,5 +53,14 @@ public class ExceptionController {
 				.errorMessage(e.getMessage())
 				.build();
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
+
+	@ExceptionHandler(GeminiApiException.class)
+	public ResponseEntity<ExceptionResponseDTO> handleGeminiApiException(GeminiApiException e) {
+		ExceptionResponseDTO response = ExceptionResponseDTO.builder()
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.errorMessage(e.getMessage())
+				.build();
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 }
