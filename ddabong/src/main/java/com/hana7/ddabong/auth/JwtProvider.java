@@ -8,8 +8,10 @@ import com.hana7.ddabong.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
@@ -59,7 +61,7 @@ public class JwtProvider {
 		claims = dto.getClaims();
 
 
-		String accessToken  = generateToken(new HashMap<>(claims), 60);
+		String accessToken  = generateToken(new HashMap<>(claims), 10);
 		String refreshToken = generateToken(new HashMap<>(claims), 60 * 24);
 
 		Map<String, Object> body = new HashMap<>(claims);
@@ -103,4 +105,13 @@ public class JwtProvider {
 
 		return (String) claims.get("email");
 	}
+
+	public static String extractTokenFromRequest(HttpServletRequest request) {
+		String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
+		if (bearer != null && bearer.startsWith("Bearer ")) {
+			return bearer.substring(7);
+		}
+		return null;
+	}
+
 }

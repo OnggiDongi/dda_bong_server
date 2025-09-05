@@ -96,6 +96,7 @@ public class SecurityConfig {
 				HttpHeaders.CACHE_CONTROL,
 				HttpHeaders.CONTENT_TYPE));
 		config.setAllowCredentials(true);
+		config.setExposedHeaders(List.of("Authorization"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);

@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface ActivityReviewRepository extends JpaRepository<ActivityReview, Long> {
 	List<ActivityReview> findByActivity(Activity activity);
-    List<ActivityReview> findByUser_Email(String email);
+    List<ActivityReview> findByUser_EmailAndDeletedAtIsNull(String email);
     List<ActivityReview> findByActivity_Id(Long activityId);
 }
