@@ -24,8 +24,8 @@ public class S3Service {
         String uuid = java.util.UUID.randomUUID().toString();
 
         // UUID를 추가
-        String key = "uploads/" + uuid + "-(" + originalName + ")";
-        Path tempFile = Files.createTempFile("upload-", uuid + "-(" + originalName + ")");
+        String key = "uploads/" + uuid + "-" + originalName;
+        Path tempFile = Files.createTempFile("upload-", uuid + "-" + originalName);
 
         file.transferTo(tempFile.toFile());
 

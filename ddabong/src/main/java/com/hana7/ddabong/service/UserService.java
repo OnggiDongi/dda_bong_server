@@ -23,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +39,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ApplicantRepository applicantRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final S3Service s3Service;
 
 
     public UserResponseDTO findUserByEmail(String email) {
@@ -50,7 +53,10 @@ public class UserService {
 			.email(user.getEmail())
 			.phoneNumber(user.getPhoneNumber())
 			.totalHour(user.getTotalHour())
-			.birthdate(user.getBirthdate())
+			.birthdate(String.format("%04d.%02d.%02d",
+				user.getBirthdate().getYear(),
+				user.getBirthdate().getMonthValue(),
+				user.getBirthdate().getDayOfMonth()))
 			.preferredRegion(user.getPreferredRegion()!= null
 				? user.getPreferredRegion()
 				: null
@@ -80,23 +86,38 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional
-    public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+	@Transactional
+	public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) throws IOException {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
-		String encodedPassword = passwordEncoder.encode(userUpdateRequestDTO.getPassword());
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		String fileUrl = (userUpdateRequestDTO.getProfileImage() != null && !userUpdateRequestDTO.getProfileImage().isEmpty())
+				? s3Service.uploadFile(userUpdateRequestDTO.getProfileImage())
+				: user.getProfileImage();
 
-        User updatedUser = user.toBuilder()
-            .name(userUpdateRequestDTO.getName())
-            .phoneNumber(userUpdateRequestDTO.getPhoneNumber())
-            .password(encodedPassword)
-            .build();
+		User updated = user.toBuilder()
+				.password(userUpdateRequestDTO.getPassword() != null
+						? passwordEncoder.encode(userUpdateRequestDTO.getPassword())
+						: user.getPassword())
+				.phoneNumber(userUpdateRequestDTO.getPhoneNumber() != null
+						? userUpdateRequestDTO.getPhoneNumber()
+						: user.getPhoneNumber())
+				.birthdate(userUpdateRequestDTO.getBirthDate() != null
+						? LocalDate.parse(userUpdateRequestDTO.getBirthDate(), fmt)
+						: user.getBirthdate())
+				.profileImage(fileUrl)
+				.preferredRegion(userUpdateRequestDTO.getPreferredRegion() != null
+						? userUpdateRequestDTO.getPreferredRegion()
+						: user.getPreferredRegion())
+				.preferredCategory(userUpdateRequestDTO.getPreferredCategory() != null
+						? Category.fromDescription(userUpdateRequestDTO.getPreferredCategory())
+						: user.getPreferredCategory())
+				.build();
 
-        userRepository.save(updatedUser);
-
-        return toDTO(updatedUser);
-    }
+		userRepository.save(updated);
+		return toDTO(updated);
+	}
 
     public List<ActivityPostResponseDTO> findLikedActivities(String email) {
         User user = userRepository.findByEmail(email)
@@ -128,10 +149,16 @@ public class UserService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .totalHour(user.getTotalHour())
-                .birthdate(user.getBirthdate())
-                .preferredRegion(user.getPreferredRegion())
+				.birthdate(String.format("%04d.%02d.%02d",
+				user.getBirthdate().getYear(),
+				user.getBirthdate().getMonthValue(),
+				user.getBirthdate().getDayOfMonth()))
+				.preferredRegion(user.getPreferredRegion())
                 .profileImage(user.getProfileImage())
-                .preferredCategory(user.getPreferredCategory().getDescription())
+				.preferredCategory(
+					user.getPreferredCategory() != null
+					? user.getPreferredCategory().getDescription()
+					: null)
 				.grade(grade)
                 .build();
     }
