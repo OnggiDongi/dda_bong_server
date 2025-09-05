@@ -134,6 +134,7 @@ public class ApplicantService {
 
 					return ApplicantReviewResponseDTO.builder()
 							.id(applicant.getId())
+							.userId(applicant.getUser().getId())
 							.name(user.getName())
 							.rate(formatAverage(totalRate))
 							.aiComment("") // TODO : AI 붙이면 넣기

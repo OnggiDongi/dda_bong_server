@@ -11,6 +11,8 @@ import lombok.Data;
 public class ApplicantReviewResponseDTO {
 	private Long id;
 
+	private Long userId;
+
 	private String name;
 
 	private String profileImage;
