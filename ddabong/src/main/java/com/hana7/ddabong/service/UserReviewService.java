@@ -55,6 +55,7 @@ public class UserReviewService {
                 .attitude(requestDTO.getAttitude())
                 .memo(requestDTO.getMemo())
                 .writeInst(loggedInInstitution.getId())
+                .activityPost(activityPost)
                 .build();
         userReviewRepository.save(userReview);
     }

@@ -35,7 +35,7 @@ public class ActivityReview extends BaseEntity {
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String content;
 
-	@Column(name = "image_url", length = 128)
+	@Column(name = "image_url", length = 255)
 	private String imageUrl;
 
 	@ManyToOne(fetch = FetchType.LAZY)

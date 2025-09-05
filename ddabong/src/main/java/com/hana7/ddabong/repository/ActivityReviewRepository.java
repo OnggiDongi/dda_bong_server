@@ -12,4 +12,6 @@ public interface ActivityReviewRepository extends JpaRepository<ActivityReview, 
 	List<ActivityReview> findByActivity(Activity activity);
     List<ActivityReview> findByUser_Email(String email);
     List<ActivityReview> findByActivity_Id(Long activityId);
+    List<ActivityReview> findByUser_Id(Long userId);
+
 }

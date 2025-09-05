@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
-    List<Applicant> findByUser(User user);
+    List<Applicant> findByUserAndDeletedAtIsNull(User user);
 
     boolean existsByUserAndActivityPostId(User user, Long activityPostId);
 
