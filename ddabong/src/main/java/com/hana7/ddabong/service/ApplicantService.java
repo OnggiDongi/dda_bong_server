@@ -35,6 +35,7 @@ public class ApplicantService {
 	private final UserRepository userRepository;
 	private final UserReviewRepository userReviewRepository;
 	private final ActivityPostRepository activityPostRepository;
+	private final UserReviewSummaryService userReviewSummaryService;
 
 	@Transactional
 	public void rejectApplicant(String email, Long applicantId) {
@@ -101,7 +102,7 @@ public class ApplicantService {
 				.phoneNumber(user.getPhoneNumber())
 				.profileImage(user.getProfileImage())
 				.preferredCategory(user.getPreferredCategory().getDescription())
-//							.reviewSummary("") // TODO : AI 붙이면 넣기
+				.reviewSummary(userReviewSummaryService.summarizeForUser(user.getId()))
 				.totalGrade(formatAverage(totalRate))
 				.healthStatus(formatAverage(totalHealthStatus))
 				.diligenceLevel(formatAverage(totalDiligenceLevel))
@@ -137,7 +138,7 @@ public class ApplicantService {
 							.userId(applicant.getUser().getId())
 							.name(user.getName())
 							.rate(formatAverage(totalRate))
-							.aiComment("") // TODO : AI 붙이면 넣기
+							.aiComment(userReviewSummaryService.summarizeForUser(user.getId())) // TODO : AI 붙이면 넣기
 							.diligenceLevel(formatAverage(avgDiligence))
 							.healthStatus(formatAverage(avgHealth))
 							.attitude(formatAverage(avgAttitude))

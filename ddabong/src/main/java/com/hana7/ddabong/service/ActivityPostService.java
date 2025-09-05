@@ -40,6 +40,7 @@ public class ActivityPostService {
 	private final ApplicantRepository applicantRepository;
 	private final ActivityPostCustomRepository activityPostCustomRepository;
 	private final SupportRequestRepository supportRequestRepository;
+	private final ActivityReviewSummaryService activityReviewSummaryService;
 
 	private final S3Service s3Service;
 
@@ -256,6 +257,8 @@ public class ActivityPostService {
 			strDday = "D-DAY";
 		}
 
+		String aiComment = activityReviewSummaryService.summarizeForActivity(activity.getId());
+
 		return toDto(post).toBuilder()
 				.dDay(strDday)
 				.category(activity.getCategory().getDescription())
@@ -263,6 +266,7 @@ public class ActivityPostService {
 				.institutionName(activity.getInstitution().getName())
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
+				.aiComment(aiComment)
 				.build();
 	}
 
