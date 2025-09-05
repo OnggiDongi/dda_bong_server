@@ -8,7 +8,9 @@ import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.RefreshTokenService;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,14 @@ public class AuthController {
 	private final RefreshTokenService refreshTokenService;
 
 	@PostMapping("/refresh")
-	public ResponseEntity<AccessTokenResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDto) {
-		AccessTokenResponseDTO dto = refreshTokenService.getNewAccessToken(refreshTokenDto);
-		return ResponseEntity.ok(dto);
+	public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+		System.out.println("request = " + request.getHeader("Authorization"));
+		String newAccessToken = refreshTokenService.getNewAccessToken(request);
+
+		ResponseEntity<Object> build = ResponseEntity.ok()
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken)
+				.build();
+		System.out.println("build = " + build);
+		return build;
 	}
 }
