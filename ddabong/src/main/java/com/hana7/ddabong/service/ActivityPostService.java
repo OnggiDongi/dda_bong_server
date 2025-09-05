@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,17 +55,16 @@ public class ActivityPostService {
 			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
 		}
 		try {
-			LocalDateTime startAt = OffsetDateTime.parse(dto.getStartAt()).toLocalDateTime();
-			LocalDateTime recruitmentEnd = OffsetDateTime.parse(dto.getRecruitmentEnd()).toLocalDateTime();
+			DateTimeFormatter fmtWithTime = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
+			LocalDateTime startAt = LocalDateTime.parse(dto.getStartAt(), fmtWithTime);
+			LocalDateTime recruitmentEnd = LocalDate.parse(dto.getRecruitmentEnd(), fmt).atStartOfDay();
+			recruitmentEnd = recruitmentEnd.plusHours(23).plusMinutes(59).plusSeconds(59);
 
-			String[] parts = dto.getActivityTime().split(":");
+			int hours = dto.getActivityTime();
 
-			int hours = Integer.parseInt(parts[0]);
-			int minutes = Integer.parseInt(parts[1]);
-
-			LocalDateTime endAt = startAt.plusHours(hours).plusMinutes(minutes);
-
+			LocalDateTime endAt = startAt.plusHours(hours);
 
 			String imageUrl;
 
@@ -130,17 +127,22 @@ public class ActivityPostService {
 		}
 
 		try {
-			LocalDateTime startAt = OffsetDateTime.parse(dto.getStartAt()).toLocalDateTime();
-			LocalDateTime recruitmentEnd = OffsetDateTime.parse(dto.getRecruitmentEnd()).toLocalDateTime();
+			DateTimeFormatter fmtWithTime = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
-			String[] parts = dto.getActivityTime().split(":");
-			int hours = Integer.parseInt(parts[0]);
-			int minutes = Integer.parseInt(parts[1]);
-			LocalDateTime endAt = startAt.plusHours(hours).plusMinutes(minutes);
+			LocalDateTime startAt = LocalDateTime.parse(dto.getStartAt(), fmtWithTime);
+			LocalDateTime recruitmentEnd = LocalDate.parse(dto.getRecruitmentEnd(), fmt).atStartOfDay();
+			recruitmentEnd = recruitmentEnd.plusHours(23).plusMinutes(59).plusSeconds(59);
+
+			int hours = dto.getActivityTime();
+
+			LocalDateTime endAt = startAt.plusHours(hours);
 
 			String fileUrl = (dto.getImage() != null && !dto.getImage().isEmpty())
 					? s3Service.uploadFile(dto.getImage())
 					: post.getImageUrl();
+
+
 
 			post = post.toBuilder()
 					.activity(activity)
@@ -373,16 +375,27 @@ public class ActivityPostService {
 
 		LocalDateTime startAt = post.getStartAt();
 		LocalDateTime endAt = post.getEndAt();
+		LocalDateTime recruitEndDate = post.getRecruitmentEnd();
+
+		int time = endAt.getHour() - startAt.getHour();
+
+		List<String> supports = post.getSupportRequests().stream()
+				.map(SupportRequest::getSupply)
+				.map(SupportRequestType::getDescription)
+				.toList();
 
 		return ActivityPostDetailResponseDTO.builder()
 				.id(post.getId())
+				.activityId(post.getActivity().getId())
 				.title(post.getTitle())
 				.content(post.getContent())
-				.date(String.format("%04d.%02d.%02d", startAt.getYear(), startAt.getMonthValue(), startAt.getDayOfMonth()))
-				.time(String.format("%02d:%02d - %02d:%02d", startAt.getHour(), startAt.getMinute(), endAt.getHour(), endAt.getMinute()))
+				.startDate(String.format("%04d.%02d.%02d %02d:%02d", startAt.getYear(), startAt.getMonthValue(), startAt.getDayOfMonth(), startAt.getHour(), startAt.getMinute()))
+				.recruitmentEndDate(String.format("%04d.%02d.%02d", recruitEndDate.getYear(), recruitEndDate.getMonthValue(), recruitEndDate.getDayOfMonth()))
+				.time(time)
 				.capacity(post.getCapacity())
 				.location(post.getLocation())
 				.imageUrl(post.getImageUrl())
+				.supports(supports)
 				.build();
 	}
 

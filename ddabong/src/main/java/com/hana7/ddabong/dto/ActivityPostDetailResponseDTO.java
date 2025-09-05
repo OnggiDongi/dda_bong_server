@@ -18,15 +18,19 @@ public class ActivityPostDetailResponseDTO {
 
 	private Long id;
 
+	private Long activityId;
+
 	private String title;
 
 	private String content;
 
 	private String dDay;
 
-	private String date;
+	private String startDate;
 
-	private String time;
+	private String recruitmentEndDate;
+
+	private int time;
 
 	private String category;
 
@@ -43,5 +47,7 @@ public class ActivityPostDetailResponseDTO {
 	private double totalAvgScore;
 
 	private List<ActivityReviewResponseDTO> reviews;
+
+	private List<String> supports;
 
 }
