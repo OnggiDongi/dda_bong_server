@@ -69,7 +69,7 @@ public class ActivityReviewService {
         if (!userRepository.existsByEmail(email)) {
             throw new NotFoundException(ErrorCode.NOTFOUND_USER);
         }
-        return activityReviewRepository.findByUser_Email(email).stream()
+        return activityReviewRepository.findByUser_EmailAndDeletedAtIsNull(email).stream()
                 .map(review -> ActivityMyReviewResponseDTO.toDTO(review, review.getActivity().getCategory().getDescription()))
                 .collect(Collectors.toList());
     }

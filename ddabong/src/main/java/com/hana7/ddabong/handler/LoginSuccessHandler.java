@@ -28,12 +28,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		Map<String, Object> body = JwtProvider.getClaims(authentication);
 
+		System.out.println(authentication.getPrincipal());
 		refreshTokenService.saveRefreshToken(body.get("email").toString(), body.get("refreshToken").toString(), 60 * 24); // 1일
-
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
+		System.out.println(objectMapper.writeValueAsString(body));
 		out.write(objectMapper.writeValueAsString(body));
 		out.close();
 	}

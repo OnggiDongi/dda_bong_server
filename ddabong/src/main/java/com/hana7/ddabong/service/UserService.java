@@ -6,14 +6,13 @@ import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
 import com.hana7.ddabong.dto.UserSummaryResponseDTO;
 import com.hana7.ddabong.dto.UserUpdateRequestDTO;
-import com.hana7.ddabong.entity.Applicant;
-import com.hana7.ddabong.entity.Likes;
-import com.hana7.ddabong.entity.User;
+import com.hana7.ddabong.entity.*;
 import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
+import com.hana7.ddabong.repository.ActivityReviewRepository;
 import com.hana7.ddabong.repository.ApplicantRepository;
 import com.hana7.ddabong.repository.LikesRepository;
 import com.hana7.ddabong.repository.UserRepository;
@@ -28,6 +27,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +40,7 @@ public class UserService {
     private final ApplicantRepository applicantRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final S3Service s3Service;
+	private final ActivityReviewRepository activityReviewRepository;
 
 
     public UserResponseDTO findUserByEmail(String email) {
@@ -133,9 +134,21 @@ public class UserService {
     public List<ActivityPostResponseDTO> findActivityHistory(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
-        List<Applicant> applicants = applicantRepository.findByUser(user);
+
+        List<Applicant> applicants = applicantRepository.findByUserAndDeletedAtIsNull(user);
+		List<ActivityReview> reviews = activityReviewRepository.findByUser_Id(user.getId());
+
+		Set<Long> reviewedActivityIds = reviews.stream()
+				.map(rv -> rv.getActivity().getId())
+				.collect(Collectors.toSet());
+
         return applicants.stream()
-                .map(applicant -> ActivityPostResponseDTO.of(applicant.getActivityPost()))
+                .map(applicant -> {
+					ActivityPost post = applicant.getActivityPost();
+					Long activityId = post.getActivity().getId();
+					boolean hasReview = reviewedActivityIds.contains(activityId);
+					return ActivityPostResponseDTO.of(post, hasReview, applicant.getStatus(), user.getTotalHour());
+				})
                 .collect(Collectors.toList());
     }
 
