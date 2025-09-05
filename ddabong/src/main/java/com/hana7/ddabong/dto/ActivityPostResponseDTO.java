@@ -36,7 +36,7 @@ public class ActivityPostResponseDTO {
                 .id(activityPost.getId())
                 .title(activityPost.getTitle())
                 .endAt(String.format(
-                        "%d.%02d.%02d %02d:%02d:%02d",
+                        "%d.%02d.%02d",
                         activityPost.getEndAt().getYear(),
                         activityPost.getEndAt().getMonthValue(),
                         activityPost.getEndAt().getDayOfMonth())
