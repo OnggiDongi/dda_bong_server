@@ -2,6 +2,7 @@ package com.hana7.ddabong.service;
 
 import com.hana7.ddabong.dto.gemini.GeminiRequest;
 import com.hana7.ddabong.dto.gemini.GeminiResponse;
+import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.GeminiApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,14 +47,16 @@ public class GeminiService {
 			);
 
 			if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
-				throw new GeminiApiException("Gemini API 호출 실패: " + res.getStatusCode());
+
+				throw new GeminiApiException(ErrorCode.SERVER_GEMINI_FAIL_CALL,"Gemini API 호출 실패: " + res.getStatusCode());
 			}
 
 			return res.getBody().getFirstCandidateText()
-					.orElseThrow(() -> new GeminiApiException("Gemini 응답에서 요약 텍스트를 찾을 수 없습니다."));
+					.orElseThrow(() -> new GeminiApiException(ErrorCode.SERVER_GEMINI_NOTFOUND_TEXT,"Gemini 응답에서 요약 텍스트를 찾을 수 없습니다."));
 
 		} catch (RestClientException e) {
-			throw new GeminiApiException("Gemini API 호출 중 오류: " + e.getMessage());
+			System.out.println("Gemini API 호출 중 오류: " + e.getMessage());
+			throw new GeminiApiException(ErrorCode.SERVER_GEMINI_FAIL_CALLING,"Gemini API 호출 중 오류: " + e.getMessage());
 		}
 	}
 }

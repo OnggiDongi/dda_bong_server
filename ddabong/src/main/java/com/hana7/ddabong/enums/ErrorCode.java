@@ -33,7 +33,11 @@ public enum ErrorCode {
 
 	CONFLICT_USER(301, "이미 존재하는 회원입니다."),
 	CONFLICT_INSTITUTION(302, "이미 존재하는 기관입니다."),
-	CONFLICT_ACTIVITY_POST(303, "이미 존재하는 게시글 입니다");
+	CONFLICT_ACTIVITY_POST(303, "이미 존재하는 게시글 입니다"),
+
+	SERVER_GEMINI_FAIL_CALL(501, "Gemini 호출을 실패했습니다,"),
+	SERVER_GEMINI_FAIL_CALLING(502, "Gemini 호출중 오류가 발생했습니다,"),
+	SERVER_GEMINI_NOTFOUND_TEXT(503,"요약 텍스트가 없습니다.");
 
 
 	private final int errorCode;

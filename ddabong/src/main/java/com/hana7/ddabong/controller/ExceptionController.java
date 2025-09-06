@@ -1,10 +1,7 @@
 package com.hana7.ddabong.controller;
 
 import com.hana7.ddabong.dto.ExceptionResponseDTO;
-import com.hana7.ddabong.exception.BadRequestException;
-import com.hana7.ddabong.exception.ConflictException;
-import com.hana7.ddabong.exception.CustomJwtException;
-import com.hana7.ddabong.exception.NotFoundException;
+import com.hana7.ddabong.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,6 +56,7 @@ public class ExceptionController {
 	public ResponseEntity<ExceptionResponseDTO> handleGeminiApiException(GeminiApiException e) {
 		ExceptionResponseDTO response = ExceptionResponseDTO.builder()
 				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.errorCode(e.getErrorCode())
 				.errorMessage(e.getMessage())
 				.build();
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

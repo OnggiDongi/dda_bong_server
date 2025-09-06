@@ -38,7 +38,6 @@ public class UserReviewSummaryService {
 			);
 			lines.add(line);
 		}
-
 		// 2) 청크 요약
 		List<String> chunkSummaries = new ArrayList<>();
 		for (int i = 0; i < lines.size(); i += chunkSize) {
