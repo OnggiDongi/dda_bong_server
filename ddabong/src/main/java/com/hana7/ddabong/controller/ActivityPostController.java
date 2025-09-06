@@ -52,7 +52,7 @@ public class ActivityPostController {
 	@GetMapping(value = "")
 	public ResponseEntity<List<ActivityPostResponseDTO>> readActivityPostList(
 			@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "1000") int pageSize,
 			@RequestParam(required = false) String searchRegion,
 			@RequestParam(required = false) String categories,
 			Authentication authentication

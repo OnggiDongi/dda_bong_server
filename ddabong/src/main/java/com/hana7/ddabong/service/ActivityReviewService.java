@@ -45,7 +45,6 @@ public class ActivityReviewService {
         boolean isApprovedApplicant = applicantRepository.findByUserAndActivityPost(user, activityPost)
                 .map(applicant -> applicant.getStatus() == ApprovalStatus.APPROVED)
                 .orElse(false);
-
         if (!isApprovedApplicant) {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_NOT_APPLICANT);
         }
@@ -57,7 +56,7 @@ public class ActivityReviewService {
         ActivityReview activityReview = ActivityReview.builder()
                 .rate(requestDTO.getRate())
                 .content(requestDTO.getContent())
-                .imageUrl(requestDTO.getImageUrl())
+                .imageUrl(requestDTO.getImageUrl() != null && !requestDTO.getImageUrl().isEmpty() ? requestDTO.getImageUrl() : null)
                 .activity(activityPost.getActivity())
                 .user(user)
                 .build();

@@ -136,7 +136,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         List<Applicant> applicants = applicantRepository.findByUserAndDeletedAtIsNull(user);
-		List<ActivityReview> reviews = activityReviewRepository.findByUser_Id(user.getId());
+		List<ActivityReview> reviews = activityReviewRepository.findByUser_Id_AndDeletedAtIsNull(user.getId());
 
 		Set<Long> reviewedActivityIds = reviews.stream()
 				.map(rv -> rv.getActivity().getId())
