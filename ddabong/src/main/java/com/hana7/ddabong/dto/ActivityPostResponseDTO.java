@@ -7,13 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Data
-@Builder
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivityPostResponseDTO {
@@ -36,7 +37,7 @@ public class ActivityPostResponseDTO {
                 .id(activityPost.getId())
                 .title(activityPost.getTitle())
                 .endAt(String.format(
-                        "%d.%02d.%02d %02d:%02d:%02d",
+                        "%d.%02d.%02d",
                         activityPost.getEndAt().getYear(),
                         activityPost.getEndAt().getMonthValue(),
                         activityPost.getEndAt().getDayOfMonth())

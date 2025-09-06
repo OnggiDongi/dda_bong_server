@@ -1,9 +1,6 @@
 package com.hana7.ddabong.controller;
 
-import com.hana7.ddabong.dto.ActivityPostDetailResponseDTO;
-import com.hana7.ddabong.dto.ActivityPostRequestDTO;
-import com.hana7.ddabong.dto.ActivityPostResponseDTO;
-import com.hana7.ddabong.dto.ApplicantListDTO;
+import com.hana7.ddabong.dto.*;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.ActivityPostService;
@@ -153,14 +150,14 @@ public class ActivityPostController {
 	@Tag(name = "자신이 작성한 봉사 모집글 조회하기")
 	@Operation(summary = "기관은 자신이 작성한 봉사 모집글을 조회할 수 있다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MyActivityPostResponseDTO.class))),
 			@ApiResponse(responseCode = "404",
 					description = "해당하는 기관이 존재하지 않습니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
 	})
 	@GetMapping("/myposts")
-	public ResponseEntity<List<ActivityPostResponseDTO>> getActivityPost(@RequestParam(required = false, defaultValue = "true") boolean isRecruting, Authentication authentication) {
-		List<ActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName(), isRecruting);
+	public ResponseEntity<List<MyActivityPostResponseDTO>> getActivityPost(@RequestParam(required = false, defaultValue = "true") boolean isRecruting, Authentication authentication) {
+		List<MyActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName(), isRecruting);
 		return ResponseEntity.ok(getMyActivityPosts);
 	}
 

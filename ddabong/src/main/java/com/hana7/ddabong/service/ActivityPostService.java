@@ -27,6 +27,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +41,7 @@ public class ActivityPostService {
 	private final ApplicantRepository applicantRepository;
 	private final ActivityPostCustomRepository activityPostCustomRepository;
 	private final SupportRequestRepository supportRequestRepository;
+	private final ActivityReviewSummaryService activityReviewSummaryService;
 
 	private final S3Service s3Service;
 
@@ -254,6 +256,8 @@ public class ActivityPostService {
 			strDday = "D-DAY";
 		}
 
+		String aiComment = activityReviewSummaryService.summarizeForActivity(activity.getId());
+
 		return toDto(post).toBuilder()
 				.dDay(strDday)
 				.category(activity.getCategory().getDescription())
@@ -261,6 +265,7 @@ public class ActivityPostService {
 				.institutionName(activity.getInstitution().getName())
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
+				.aiComment(aiComment)
 				.build();
 	}
 
@@ -315,13 +320,13 @@ public class ActivityPostService {
 		applicantRepository.save(applicant);
 	}
 
-	public List<ActivityPostResponseDTO> getMyActivityPosts(String email, boolean isRecruting) {
+	public List<MyActivityPostResponseDTO> getMyActivityPosts(String email, boolean isRecruting) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
 		List<Activity> activities = activityRepository.findByInstitution(institution);
 
-		List<ActivityPostResponseDTO> dtos = new ArrayList<>();
+		List<MyActivityPostResponseDTO> dtos = new ArrayList<>();
 		activities.forEach(
 				activity ->
 				{
@@ -331,14 +336,18 @@ public class ActivityPostService {
 					} else {
 						posts = activityPostRepository.findByActivity_IdAndEndAtBefore(activity.getId(), LocalDateTime.now());
 					}
-					List<ActivityPostResponseDTO> list = posts.stream()
+
+					List<ActivityReview> reviews = activityReviewRepository.findByActivity_Id(activity.getId());
+					double totalAvgScore = reviews.stream().mapToInt(ActivityReview::getRate).average().orElse(0);
+
+					List<MyActivityPostResponseDTO> list = posts.stream()
 							.map(post -> {
 								// 지원자 총 인원 수
 								long applicants = post.getApplicants().stream()
 										.filter(applicant -> !applicant.getStatus().equals(ApprovalStatus.REJECTED))
 										.count();
 
-								return ActivityPostResponseDTO.builder()
+								return MyActivityPostResponseDTO.builder()
 										.id(post.getId())
 										.title(post.getTitle())
 										.endAt(String.format(
@@ -351,8 +360,10 @@ public class ActivityPostService {
 										.imageUrl(post.getImageUrl())
 										.category(post.getActivity().getCategory())
 										.applicantNum((int) applicants)
+										.totalAvgScore(totalAvgScore)
+										.capacity(post.getCapacity())
 										.build();
-							}).toList();
+							}).collect(Collectors.toCollection(ArrayList::new));
 					dtos.addAll(list);
 				}
 		);
