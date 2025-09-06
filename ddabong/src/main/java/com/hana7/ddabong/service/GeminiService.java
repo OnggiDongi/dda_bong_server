@@ -28,7 +28,7 @@ public class GeminiService {
 
 	/** 프롬프트 한 개를 넣으면 요약 텍스트를 반환 */
 	public String summarize(String prompt) {
-		URI endpoint = UriComponentsBuilder.fromHttpUrl(apiUrl)
+		URI endpoint = UriComponentsBuilder.fromUriString(apiUrl)
 				.path("/v1beta/models/{model}:generateContent")
 				.queryParam("key", apiKey)
 				.buildAndExpand(model)
