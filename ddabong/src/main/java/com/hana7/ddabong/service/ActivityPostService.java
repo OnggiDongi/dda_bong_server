@@ -267,7 +267,7 @@ public class ActivityPostService {
 				.institutionName(activity.getInstitution().getName())
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
-				// .aiComment(aiComment)
+				 .aiComment(aiComment)
 				.build();
 	}
 
