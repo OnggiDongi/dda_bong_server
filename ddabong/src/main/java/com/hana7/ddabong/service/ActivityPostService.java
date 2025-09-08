@@ -334,9 +334,9 @@ public class ActivityPostService {
 				{
 					List<ActivityPost> posts;
 					if (isRecruting) {
-						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfter(activity.getId(), LocalDateTime.now());
+						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfterAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
 					} else {
-						posts = activityPostRepository.findByActivity_IdAndEndAtBefore(activity.getId(), LocalDateTime.now());
+						posts = activityPostRepository.findByActivity_IdAndEndAtBeforeAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
 					}
 
 					List<ActivityReview> reviews = activityReviewRepository.findByActivity_Id(activity.getId());

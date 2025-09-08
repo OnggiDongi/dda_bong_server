@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ActivityPostRepository extends JpaRepository<ActivityPost, Long> {
-	List<ActivityPost> findByActivity_IdAndEndAtBefore(Long activityId, LocalDateTime endAtAfter);
+	List<ActivityPost> findByActivity_IdAndEndAtBeforeAndDeletedAtIsNull(Long activityId, LocalDateTime endAtAfter);
 
-	List<ActivityPost> findByActivity_IdAndRecruitmentEndAfter(Long activityId, LocalDateTime recruitmentEndAfter);
+	List<ActivityPost> findByActivity_IdAndRecruitmentEndAfterAndDeletedAtIsNull(Long activityId, LocalDateTime recruitmentEndAfter);
 }
