@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +29,14 @@ public class ActivityPostCustomRepositoryImpl implements ActivityPostCustomRepos
     }
 
     @Override
-    public Page<ActivityPost> findAllActivityPost(Pageable pageable, String preferredRegion, String searchRegion, List<Category> categories) {
+    public Page<ActivityPost> findAllActivityPostAndRecruitmentEndAfter(Pageable pageable, String preferredRegion, String searchRegion, List<Category> categories) {
         QActivityPost qActivityPost = QActivityPost.activityPost;
         QActivity qActivity = QActivity.activity;
 
         // where문
         BooleanExpression regionFilter = hasText(searchRegion) ? qActivityPost.location.contains(searchRegion) : null;
         BooleanExpression categoryFilter = (categories != null && !categories.isEmpty()) ? qActivity.category.in(categories) : null;
+        BooleanExpression recruitmentEndFilter = qActivityPost.recruitmentEnd.after(LocalDateTime.now());
         BooleanExpression notDeletedFilter = qActivityPost.deletedAt.isNull();
 
         // order
@@ -52,7 +54,7 @@ public class ActivityPostCustomRepositoryImpl implements ActivityPostCustomRepos
 
         List<ActivityPost> activityPosts = jpaQueryFactory.selectFrom(qActivityPost)
                 .join(qActivityPost.activity, qActivity)
-                .where(regionFilter, categoryFilter, notDeletedFilter)
+                .where(regionFilter, categoryFilter, notDeletedFilter, recruitmentEndFilter)
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

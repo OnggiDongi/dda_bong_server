@@ -105,7 +105,7 @@ public class ActivityPostService {
 			List<Category> categoryList = (categories == null || categories.isBlank())
 					? null : Arrays.stream(categories.split(",")).map(Category::valueOf).toList();
 			PageRequest pageable = PageRequest.of(page -1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-			Page<ActivityPost> activityPosts = activityPostCustomRepository.findAllActivityPost(pageable, user.getPreferredRegion(), searchRegion, categoryList);
+			Page<ActivityPost> activityPosts = activityPostCustomRepository.findAllActivityPostAndRecruitmentEndAfter(pageable, user.getPreferredRegion(), searchRegion, categoryList);
 			List<ActivityPostResponseDTO> body = activityPosts.stream()
 					.map(ActivityPostResponseDTO::fromEntity)
 					.toList();

@@ -8,5 +8,5 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ActivityPostCustomRepository {
-    Page<ActivityPost> findAllActivityPost(Pageable pageable, String preferredRegion, String searchRegion, List<Category> categories);
+    Page<ActivityPost> findAllActivityPostAndRecruitmentEndAfter(Pageable pageable, String preferredRegion, String searchRegion, List<Category> categories);
 }
