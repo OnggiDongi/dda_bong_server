@@ -20,6 +20,7 @@ public class UserReviewSummaryService {
 	private int chunkSize;
 
 	public String summarizeForUser(Long userId) {
+		System.out.println("userId = " + userId);
 		List<UserReview> reviews = userReviewRepository.findByUserId(userId);
 		if (reviews.isEmpty()) {
 			return "아직 등록된 사용자 리뷰가 없습니다.";

@@ -72,9 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-		System.out.println("authHeader: " + authHeader);
 		try {
-			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 
 			String email = (String)claims.get("email");

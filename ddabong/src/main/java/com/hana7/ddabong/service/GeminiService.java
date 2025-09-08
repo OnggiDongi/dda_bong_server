@@ -18,6 +18,8 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class GeminiService {
 
+	private static int count = 0;
+
 	@Value("${gemini.api.url}")
 	private String apiUrl;
 	@Value("${gemini.model}")
@@ -45,6 +47,7 @@ public class GeminiService {
 			ResponseEntity<GeminiResponse> res = restTemplate.exchange(
 					endpoint, HttpMethod.POST, req, GeminiResponse.class
 			);
+			System.out.println("호출 중" + count++);
 
 			if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
 
