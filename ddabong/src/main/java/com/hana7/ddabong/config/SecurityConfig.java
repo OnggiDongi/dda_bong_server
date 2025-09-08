@@ -84,7 +84,7 @@ public class SecurityConfig {
 	private CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 //		config.setAllowedOrigins(List.of("http://localhost:3000")); // 정확한 origin 명시
-		config.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+		config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://ddabong.topician.com/"));
 		config.setAllowedMethods(List.of(
 				HttpMethod.GET.name(),
 				HttpMethod.POST.name(),
