@@ -105,7 +105,7 @@ public class ActivityPostService {
 			List<Category> categoryList = (categories == null || categories.isBlank())
 					? null : Arrays.stream(categories.split(",")).map(Category::valueOf).toList();
 			PageRequest pageable = PageRequest.of(page -1, pageSize, Sort.by(Sort.Direction.DESC, "id"));
-			Page<ActivityPost> activityPosts = activityPostCustomRepository.findAllActivityPost(pageable, user.getPreferredRegion(), searchRegion, categoryList);
+			Page<ActivityPost> activityPosts = activityPostCustomRepository.findAllActivityPostAndRecruitmentEndAfter(pageable, user.getPreferredRegion(), searchRegion, categoryList);
 			List<ActivityPostResponseDTO> body = activityPosts.stream()
 					.map(ActivityPostResponseDTO::fromEntity)
 					.toList();
@@ -267,7 +267,7 @@ public class ActivityPostService {
 				.institutionName(activity.getInstitution().getName())
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
-				.aiComment(aiComment)
+				 .aiComment(aiComment)
 				.build();
 	}
 
@@ -334,9 +334,9 @@ public class ActivityPostService {
 				{
 					List<ActivityPost> posts;
 					if (isRecruting) {
-						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfter(activity.getId(), LocalDateTime.now());
+						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfterAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
 					} else {
-						posts = activityPostRepository.findByActivity_IdAndEndAtBefore(activity.getId(), LocalDateTime.now());
+						posts = activityPostRepository.findByActivity_IdAndEndAtBeforeAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
 					}
 
 					List<ActivityReview> reviews = activityReviewRepository.findByActivity_Id(activity.getId());

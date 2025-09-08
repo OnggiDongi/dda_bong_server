@@ -4,6 +4,7 @@ import com.hana7.ddabong.dto.gemini.GeminiRequest;
 import com.hana7.ddabong.dto.gemini.GeminiResponse;
 import com.hana7.ddabong.exception.GeminiApiException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GeminiService {
 
 	@Value("${gemini.api.url}")
@@ -24,7 +26,7 @@ public class GeminiService {
 	@Value("${gemini.key}")
 	private String apiKey;
 
-	private final RestTemplate restTemplate = new RestTemplate();
+	private final RestTemplate restTemplate;
 
 	/** 프롬프트 한 개를 넣으면 요약 텍스트를 반환 */
 	public String summarize(String prompt) {
@@ -46,6 +48,7 @@ public class GeminiService {
 			);
 
 			if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
+				log.error("Gemini API 호출 실패: 응답 코드 {}", res.getStatusCode());
 				throw new GeminiApiException("Gemini API 호출 실패: " + res.getStatusCode());
 			}
 
@@ -53,6 +56,7 @@ public class GeminiService {
 					.orElseThrow(() -> new GeminiApiException("Gemini 응답에서 요약 텍스트를 찾을 수 없습니다."));
 
 		} catch (RestClientException e) {
+			log.error("Gemini API 호출 중 오류 발생", e);
 			throw new GeminiApiException("Gemini API 호출 중 오류: " + e.getMessage());
 		}
 	}

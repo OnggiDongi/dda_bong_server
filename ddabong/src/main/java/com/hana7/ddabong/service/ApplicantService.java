@@ -23,8 +23,11 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -124,9 +127,21 @@ public class ApplicantService {
 		}
 
 		List<Applicant> applicants = applicantRepository.findByActivityPostIdAndDeletedAtIsNull(activityPostId);
+
+		// 1. 모든 지원자의 리뷰를 한번에 조회
+		List<Long> userIds = applicants.stream().map(a -> a.getUser().getId()).toList();
+		List<UserReview> allReviews = userReviewRepository.findByUserIdIn(userIds);
+
+		// 2. 사용자 ID별로 리뷰를 그룹화
+		Map<Long, List<UserReview>> reviewsByUserId = allReviews.stream()
+				.collect(Collectors.groupingBy(review -> review.getUser().getId()));
+
+		// 3. AI 요약 일괄 요청
+		Map<Long, String> summaries = userReviewSummaryService.summarizeForMultipleUsers(reviewsByUserId);
+
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
 					User user = applicant.getUser();
-					List<UserReview> userReviews = userReviewRepository.findByUserId(user.getId());
+					List<UserReview> userReviews = reviewsByUserId.getOrDefault(user.getId(), Collections.emptyList());
 
 					double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
 					double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
@@ -138,7 +153,7 @@ public class ApplicantService {
 							.userId(applicant.getUser().getId())
 							.name(user.getName())
 							.rate(formatAverage(totalRate))
-							.aiComment(userReviewSummaryService.summarizeForUser(user.getId())) // TODO : AI 붙이면 넣기
+							.aiComment(summaries.getOrDefault(user.getId(), "리뷰가 없습니다."))
 							.diligenceLevel(formatAverage(avgDiligence))
 							.healthStatus(formatAverage(avgHealth))
 							.attitude(formatAverage(avgAttitude))

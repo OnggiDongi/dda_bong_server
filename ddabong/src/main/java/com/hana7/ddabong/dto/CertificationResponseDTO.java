@@ -16,14 +16,14 @@ public class CertificationResponseDTO {
     private Long id;
     private String username;
     private int hour;
-    private LocalDateTime issuedAt;
+    private String issuedAt;
 
     public static CertificationResponseDTO from(Certification certification, String userName) {
         return CertificationResponseDTO.builder()
                 .id(certification.getId())
                 .hour(certification.getHour())
                 .username(userName)
-                .issuedAt(certification.getCreatedAt())
+                .issuedAt(certification.getCreatedAt().toString())
                 .build();
     }
 }
