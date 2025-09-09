@@ -23,9 +23,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+	private final RedisTemplate<String, String> redisTemplate;
 
 	@Tag(name = "내 정보")
 	@Operation(summary = "유저의 이메일로 유저 정보(이름, 전화번호, 생년월일, 프로필 사진, 선호지역/카테고리 , 등급) 조회")
@@ -126,5 +129,11 @@ public class UserController {
 	public ResponseEntity<UserSummaryResponseDTO> getUserSummaryByEmail(Authentication authentication) {
 		String email = authentication.getName();
 		return ResponseEntity.ok(userService.findUserSummaryByEmail(email));
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(Authentication authentication) {
+		redisTemplate.delete(authentication.getName());
+		return ResponseEntity.ok().build();
 	}
 }
