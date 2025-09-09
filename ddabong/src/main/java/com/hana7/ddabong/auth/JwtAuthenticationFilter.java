@@ -52,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/*.html",
 		"/auth/refresh",
 		"/upload/**",
+		"/broadcast/**"
 	};
 
 	@Override
@@ -66,15 +67,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 									@NonNull FilterChain filterChain) throws ServletException, IOException {
 		String uri = request.getRequestURI();
 
-		// ✅ refresh 요청은 accessToken 없이 통과시켜야 함
 		if (uri.equals("/auth/refresh")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-		System.out.println("authHeader: " + authHeader);
+//		System.out.println("authHeader: " + authHeader);
 		try {
-			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 
 			String email = (String)claims.get("email");

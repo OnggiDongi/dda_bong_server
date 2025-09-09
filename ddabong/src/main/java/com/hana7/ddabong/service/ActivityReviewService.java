@@ -42,7 +42,7 @@ public class ActivityReviewService {
         ActivityPost activityPost = activityPostRepository.findById(activityPostId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
-        boolean isApprovedApplicant = applicantRepository.findByUserAndActivityPost(user, activityPost)
+        boolean isApprovedApplicant = applicantRepository.findByUserAndActivityPostAndDeletedAtIsNull(user, activityPost)
                 .map(applicant -> applicant.getStatus() == ApprovalStatus.APPROVED)
                 .orElse(false);
         if (!isApprovedApplicant) {

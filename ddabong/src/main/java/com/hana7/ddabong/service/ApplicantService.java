@@ -23,10 +23,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +38,7 @@ public class ApplicantService {
 	private final UserReviewSummaryService userReviewSummaryService;
 
 	@Transactional
-	public void rejectApplicant(String email, Long applicantId) {
+	public Long rejectApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -70,6 +67,8 @@ public class ApplicantService {
 				.status(ApprovalStatus.REJECTED)
 				.build();
 		applicantRepository.save(applicant);
+
+		return applicant.getActivityPost().getId();
 	}
 
 	public ApplicantDetailResponseDTO getApplicantInfo(Long userId){
@@ -185,7 +184,7 @@ public class ApplicantService {
 	}
 
 	@Transactional
-	public void approveApplicant(String email, Long applicantId) {
+	public Long approveApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -214,6 +213,7 @@ public class ApplicantService {
 				.status(ApprovalStatus.APPROVED)
 				.build();
 		applicantRepository.save(applicant);
+		return applicant.getActivityPost().getId();
 	}
 
 	private List<UserReviewResponseDTO> toReviewDto(List<UserReview> userReviews){
