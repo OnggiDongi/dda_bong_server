@@ -322,6 +322,57 @@ public class ActivityPostService {
 		applicantRepository.save(applicant);
 	}
 
+	public List<MyActivityPostResponseDTO> getMyActivityPosts2(String email, boolean isRecruting) {
+		Institution institution = institutionRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		List<Activity> activities = activityRepository.findByInstitution(institution);
+
+		List<MyActivityPostResponseDTO> dtos = new ArrayList<>();
+		activities.forEach(
+				activity ->
+				{
+					List<ActivityPost> posts;
+					if (isRecruting) {
+						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfterAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
+					} else {
+						posts = activityPostRepository.findByActivity_IdAndEndAtBeforeAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
+					}
+
+					List<ActivityReview> reviews = activityReviewRepository.findByActivity_Id(activity.getId());
+					double totalAvgScore = reviews.stream().mapToInt(ActivityReview::getRate).average().orElse(0);
+
+					List<MyActivityPostResponseDTO> list = posts.stream()
+							.map(post -> {
+								// 지원자 총 인원 수
+								long applicants = post.getApplicants().stream()
+										.filter(applicant -> applicant.getStatus().equals(ApprovalStatus.PENDING))
+										.count();
+
+								return MyActivityPostResponseDTO.builder()
+										.id(post.getId())
+										.title(post.getTitle())
+										.endAt(String.format(
+												"%d.%02d.%02d",
+												post.getEndAt().getYear(),
+												post.getEndAt().getMonthValue(),
+												post.getEndAt().getDayOfMonth())
+										)
+										.location(post.getLocation())
+										.imageUrl(post.getImageUrl())
+										.category(post.getActivity().getCategory())
+										.applicantNum((int) applicants)
+										.totalAvgScore(totalAvgScore)
+										.capacity(post.getCapacity())
+										.build();
+							}).collect(Collectors.toCollection(ArrayList::new));
+					dtos.addAll(list);
+				}
+		);
+		return dtos;
+	}
+
+
 	public List<MyActivityPostResponseDTO> getMyActivityPosts(String email, boolean isRecruting) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
