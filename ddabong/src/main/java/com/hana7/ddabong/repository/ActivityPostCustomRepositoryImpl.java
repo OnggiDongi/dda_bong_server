@@ -48,7 +48,16 @@ public class ActivityPostCustomRepositoryImpl implements ActivityPostCustomRepos
                             .otherwise(0)
                             .desc();
             orderSpecifiers.add(preferFirst);
+
+            OrderSpecifier<Integer> categoryPriority =
+                    new CaseBuilder()
+                            .when(qActivity.category.eq(Category.EDUCATION)).then(1)
+                            .otherwise(0)
+                            .desc();
+
+            orderSpecifiers.add(categoryPriority);
         }
+
         // 최신순
         orderSpecifiers.add(qActivityPost.id.desc());
 

@@ -99,6 +99,7 @@ public class ApplicantService {
 				.mapToInt(UserReviewResponseDTO::getAttitude)
 				.average().orElse(0);
 
+		// TODO : AIComment
 		String aiComment = userReviewSummaryService.summarizeForUser(user.getId());
 		return ApplicantDetailResponseDTO.builder()
 				.userName(user.getName())
@@ -110,8 +111,8 @@ public class ApplicantService {
 				.healthStatus(formatAverage(totalHealthStatus))
 				.diligenceLevel(formatAverage(totalDiligenceLevel))
 				.attitude(formatAverage(totalAttitude))
-//				.reviewSummary(aiComment)
-				.reviewSummary("ai 연결 중지")
+				.reviewSummary(aiComment)
+//				.reviewSummary("ai 연결 중지")
 				.userReviews(reviewDto)
 				.build();
 	}
@@ -138,7 +139,8 @@ public class ApplicantService {
 				.collect(Collectors.groupingBy(review -> review.getUser().getId()));
 
 		// 3. AI 요약 일괄 요청
-//		Map<Long, String> summaries = userReviewSummaryService.summarizeForMultipleUsers(reviewsByUserId);
+		// TODO : AIComment
+		Map<Long, String> summaries = userReviewSummaryService.summarizeForMultipleUsers(reviewsByUserId);
 
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
 					User user = applicant.getUser();
@@ -156,8 +158,8 @@ public class ApplicantService {
 							.userId(applicant.getUser().getId())
 							.name(user.getName())
 							.rate(formatAverage(totalRate))
-							.aiComment("ai comment 연결 중지")
-//							.aiComment(summaries.getOrDefault(user.getId(), "리뷰가 없습니다."))
+//							.aiComment("ai comment 연결 중지")
+							.aiComment(summaries.getOrDefault(user.getId(), "리뷰가 없습니다."))
 							.diligenceLevel(formatAverage(avgDiligence))
 							.healthStatus(formatAverage(avgHealth))
 							.attitude(formatAverage(avgAttitude))
