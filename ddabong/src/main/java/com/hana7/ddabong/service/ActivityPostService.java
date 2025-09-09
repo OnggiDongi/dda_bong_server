@@ -258,7 +258,7 @@ public class ActivityPostService {
 			strDday = "D-DAY";
 		}
 
-		String aiComment = activityReviewSummaryService.summarizeForActivity(activity.getId());
+//		String aiComment = activityReviewSummaryService.summarizeForActivity(activity.getId());
 
 		return toDto(post).toBuilder()
 				.dDay(strDday)
@@ -267,7 +267,7 @@ public class ActivityPostService {
 				.institutionName(activity.getInstitution().getName())
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
-				 .aiComment(aiComment)
+//				 .aiComment(aiComment)
 				.build();
 	}
 
