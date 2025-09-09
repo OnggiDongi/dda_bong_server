@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class UserRequestDTO {
 
 	@NotBlank(message = "일반 회원의 이름을 입력해주세요.")

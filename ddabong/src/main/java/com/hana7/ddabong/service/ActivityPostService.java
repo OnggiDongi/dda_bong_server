@@ -142,7 +142,7 @@ public class ActivityPostService {
 
 			String fileUrl = (dto.getImage() != null && !dto.getImage().isEmpty())
 					? s3Service.uploadFile(dto.getImage())
-					: post.getImageUrl();
+					: "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)";
 
 
 
@@ -258,7 +258,7 @@ public class ActivityPostService {
 			strDday = "D-DAY";
 		}
 
-		String aiComment = activityReviewSummaryService.summarizeForActivity(activity.getId());
+//		String aiComment = activityReviewSummaryService.summarizeForActivity(activity.getId());
 
 		return toDto(post).toBuilder()
 				.dDay(strDday)
@@ -267,7 +267,7 @@ public class ActivityPostService {
 				.institutionName(activity.getInstitution().getName())
 				.institutionPhoneNumber(activity.getInstitution().getPhoneNumber())
 				.totalAvgScore(totalAvgRate)
-				 .aiComment(aiComment)
+//				 .aiComment(aiComment)
 				.build();
 	}
 

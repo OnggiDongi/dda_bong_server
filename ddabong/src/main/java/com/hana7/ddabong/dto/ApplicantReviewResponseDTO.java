@@ -28,4 +28,6 @@ public class ApplicantReviewResponseDTO {
 	private String aiComment;
 
 	private String status;
+
+	private boolean hasReview;
 }
