@@ -143,7 +143,9 @@ public class ApplicantService {
 					User user = applicant.getUser();
 					List<UserReview> userReviews = reviewsByUserId.getOrDefault(user.getId(), Collections.emptyList());
 
-					double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
+			boolean hasReview = userReviewRepository.existsByUserIdAndActivityPost_Id(user.getId(), activityPostId);
+
+			double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
 					double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
 					double avgAttitude = userReviews.stream().mapToDouble(UserReview::getAttitude).average().orElse(0.0);
 					double totalRate = (avgHealth + avgDiligence + avgAttitude) / 3.0;
@@ -159,6 +161,7 @@ public class ApplicantService {
 							.attitude(formatAverage(avgAttitude))
 							.status(applicant.getStatus().toString())
 							.profileImage(user.getProfileImage())
+							.hasReview(hasReview)
 							.build();
 				}
 		).toList();

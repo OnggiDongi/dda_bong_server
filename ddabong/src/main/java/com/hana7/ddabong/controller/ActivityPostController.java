@@ -157,7 +157,7 @@ public class ActivityPostController {
 	})
 	@GetMapping("/myposts")
 	public ResponseEntity<List<MyActivityPostResponseDTO>> getActivityPost(@RequestParam(required = false, defaultValue = "true") boolean isRecruting, Authentication authentication) {
-		List<MyActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName(), isRecruting);
+		List<MyActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts2(authentication.getName(), isRecruting);
 		return ResponseEntity.ok(getMyActivityPosts);
 	}
 

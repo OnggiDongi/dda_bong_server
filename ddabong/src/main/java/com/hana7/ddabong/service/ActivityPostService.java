@@ -142,7 +142,7 @@ public class ActivityPostService {
 
 			String fileUrl = (dto.getImage() != null && !dto.getImage().isEmpty())
 					? s3Service.uploadFile(dto.getImage())
-					: post.getImageUrl();
+					: "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)";
 
 
 
@@ -321,6 +321,57 @@ public class ActivityPostService {
 		applicant.markDeleted();
 		applicantRepository.save(applicant);
 	}
+
+	public List<MyActivityPostResponseDTO> getMyActivityPosts2(String email, boolean isRecruting) {
+		Institution institution = institutionRepository.findByEmail(email)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
+
+		List<Activity> activities = activityRepository.findByInstitution(institution);
+
+		List<MyActivityPostResponseDTO> dtos = new ArrayList<>();
+		activities.forEach(
+				activity ->
+				{
+					List<ActivityPost> posts;
+					if (isRecruting) {
+						posts = activityPostRepository.findByActivity_IdAndRecruitmentEndAfterAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
+					} else {
+						posts = activityPostRepository.findByActivity_IdAndEndAtBeforeAndDeletedAtIsNull(activity.getId(), LocalDateTime.now());
+					}
+
+					List<ActivityReview> reviews = activityReviewRepository.findByActivity_Id(activity.getId());
+					double totalAvgScore = reviews.stream().mapToInt(ActivityReview::getRate).average().orElse(0);
+
+					List<MyActivityPostResponseDTO> list = posts.stream()
+							.map(post -> {
+								// 지원자 총 인원 수
+								long applicants = post.getApplicants().stream()
+										.filter(applicant -> applicant.getStatus().equals(ApprovalStatus.PENDING))
+										.count();
+
+								return MyActivityPostResponseDTO.builder()
+										.id(post.getId())
+										.title(post.getTitle())
+										.endAt(String.format(
+												"%d.%02d.%02d",
+												post.getEndAt().getYear(),
+												post.getEndAt().getMonthValue(),
+												post.getEndAt().getDayOfMonth())
+										)
+										.location(post.getLocation())
+										.imageUrl(post.getImageUrl())
+										.category(post.getActivity().getCategory())
+										.applicantNum((int) applicants)
+										.totalAvgScore(totalAvgScore)
+										.capacity(post.getCapacity())
+										.build();
+							}).collect(Collectors.toCollection(ArrayList::new));
+					dtos.addAll(list);
+				}
+		);
+		return dtos;
+	}
+
 
 	public List<MyActivityPostResponseDTO> getMyActivityPosts(String email, boolean isRecruting) {
 		Institution institution = institutionRepository.findByEmail(email)

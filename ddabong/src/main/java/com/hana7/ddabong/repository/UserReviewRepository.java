@@ -12,4 +12,7 @@ public interface UserReviewRepository extends JpaRepository<UserReview, Long> {
 
     List<UserReview> findByUserIdIn(List<Long> userIds);
 
+	Optional<UserReview> findByUserIdAndActivityPost_Id(Long userId, Long activityPostId);
+
+	boolean existsByUserIdAndActivityPost_Id(Long userId, Long activityPostId);
 }
