@@ -95,8 +95,8 @@ public class SecurityConfig {
 				HttpHeaders.AUTHORIZATION,
 				HttpHeaders.CACHE_CONTROL,
 				HttpHeaders.CONTENT_TYPE,
-			"ngrok-skip-browser-warning"
-			));
+				"ngrok-skip-browser-warning"
+				));
 		config.setAllowCredentials(true);
 		config.setExposedHeaders(List.of("Authorization"));
 
