@@ -49,14 +49,14 @@ public class ActivityReviewService {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_NOT_APPLICANT);
         }
         // TODO :: 실제 시간과 비교하여 활동 끝났는지 확인하려면 주석 풀기. 지금은 가라데이터라 여기서 걸려서 주석처리합니다리
-        // if (activityPost.getEndAt().isAfter(LocalDateTime.now())) {
-        //     throw new BadRequestException(ErrorCode.BAD_REQUEST_ACTIVITY_NOT_COMPLETED);
-        // }
+         if (activityPost.getEndAt().isAfter(LocalDateTime.now())) {
+             throw new BadRequestException(ErrorCode.BAD_REQUEST_ACTIVITY_NOT_COMPLETED);
+         }
 
         ActivityReview activityReview = ActivityReview.builder()
                 .rate(requestDTO.getRate())
                 .content(requestDTO.getContent())
-                .imageUrl(requestDTO.getImageUrl() != null && !requestDTO.getImageUrl().isEmpty() ? requestDTO.getImageUrl() : null)
+                .imageUrl(requestDTO.getImageUrl() != null && !requestDTO.getImageUrl().isEmpty() ? requestDTO.getImageUrl() : "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)")
                 .activity(activityPost.getActivity())
                 .user(user)
                 .build();
