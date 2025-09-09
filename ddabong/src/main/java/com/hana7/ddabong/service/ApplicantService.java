@@ -99,18 +99,19 @@ public class ApplicantService {
 				.mapToInt(UserReviewResponseDTO::getAttitude)
 				.average().orElse(0);
 
+		String aiComment = userReviewSummaryService.summarizeForUser(user.getId());
 		return ApplicantDetailResponseDTO.builder()
 				.userName(user.getName())
 				.birthDate(formatDate(user.getBirthdate()))
 				.phoneNumber(user.getPhoneNumber())
 				.profileImage(user.getProfileImage())
 				.preferredCategory(user.getPreferredCategory().getDescription())
-				.reviewSummary(userReviewSummaryService.summarizeForUser(user.getId()))
 				.totalGrade(formatAverage(totalRate))
 				.healthStatus(formatAverage(totalHealthStatus))
 				.diligenceLevel(formatAverage(totalDiligenceLevel))
 				.attitude(formatAverage(totalAttitude))
-
+//				.reviewSummary(aiComment)
+				.reviewSummary("ai 연결 중지")
 				.userReviews(reviewDto)
 				.build();
 	}
@@ -137,13 +138,15 @@ public class ApplicantService {
 				.collect(Collectors.groupingBy(review -> review.getUser().getId()));
 
 		// 3. AI 요약 일괄 요청
-		Map<Long, String> summaries = userReviewSummaryService.summarizeForMultipleUsers(reviewsByUserId);
+//		Map<Long, String> summaries = userReviewSummaryService.summarizeForMultipleUsers(reviewsByUserId);
 
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
 					User user = applicant.getUser();
 					List<UserReview> userReviews = reviewsByUserId.getOrDefault(user.getId(), Collections.emptyList());
 
-					double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
+			boolean hasReview = userReviewRepository.existsByUserIdAndActivityPost_Id(user.getId(), activityPostId);
+
+			double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
 					double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
 					double avgAttitude = userReviews.stream().mapToDouble(UserReview::getAttitude).average().orElse(0.0);
 					double totalRate = (avgHealth + avgDiligence + avgAttitude) / 3.0;
@@ -153,12 +156,14 @@ public class ApplicantService {
 							.userId(applicant.getUser().getId())
 							.name(user.getName())
 							.rate(formatAverage(totalRate))
-							.aiComment(summaries.getOrDefault(user.getId(), "리뷰가 없습니다."))
+							.aiComment("ai comment 연결 중지")
+//							.aiComment(summaries.getOrDefault(user.getId(), "리뷰가 없습니다."))
 							.diligenceLevel(formatAverage(avgDiligence))
 							.healthStatus(formatAverage(avgHealth))
 							.attitude(formatAverage(avgAttitude))
 							.status(applicant.getStatus().toString())
 							.profileImage(user.getProfileImage())
+							.hasReview(hasReview)
 							.build();
 				}
 		).toList();

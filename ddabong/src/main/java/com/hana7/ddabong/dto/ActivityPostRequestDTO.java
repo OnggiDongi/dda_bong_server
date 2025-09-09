@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder
 public class ActivityPostRequestDTO {
 
     @NotBlank(message = "제목은 필수 값입니다.")
