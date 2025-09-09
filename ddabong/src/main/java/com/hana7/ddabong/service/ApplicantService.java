@@ -99,18 +99,19 @@ public class ApplicantService {
 				.mapToInt(UserReviewResponseDTO::getAttitude)
 				.average().orElse(0);
 
+		String aiComment = userReviewSummaryService.summarizeForUser(user.getId());
 		return ApplicantDetailResponseDTO.builder()
 				.userName(user.getName())
 				.birthDate(formatDate(user.getBirthdate()))
 				.phoneNumber(user.getPhoneNumber())
 				.profileImage(user.getProfileImage())
 				.preferredCategory(user.getPreferredCategory().getDescription())
-				.reviewSummary(userReviewSummaryService.summarizeForUser(user.getId()))
 				.totalGrade(formatAverage(totalRate))
 				.healthStatus(formatAverage(totalHealthStatus))
 				.diligenceLevel(formatAverage(totalDiligenceLevel))
 				.attitude(formatAverage(totalAttitude))
-
+//				.reviewSummary(aiComment)
+				.reviewSummary("ai 연결 중지")
 				.userReviews(reviewDto)
 				.build();
 	}
