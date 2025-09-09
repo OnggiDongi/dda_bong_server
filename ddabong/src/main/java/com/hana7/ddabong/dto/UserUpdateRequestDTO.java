@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateRequestDTO {
