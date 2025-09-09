@@ -142,7 +142,7 @@ public class ActivityPostService {
 
 			String fileUrl = (dto.getImage() != null && !dto.getImage().isEmpty())
 					? s3Service.uploadFile(dto.getImage())
-					: post.getImageUrl();
+					: "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/abbbe69a-308d-4b60-9874-7b5935046c7d-(Frame%202087327065.png)";
 
 
 
