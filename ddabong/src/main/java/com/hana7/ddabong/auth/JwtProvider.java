@@ -46,7 +46,7 @@ public class JwtProvider {
 		Map<String, Object> claims =  new HashMap<>();
 
 		if (authentication.getPrincipal() instanceof MemberDTO d) { // 일반 로그인
-			dto = new MemberDTO(d.getEmail(), "", d.getName(), d.getRole(), d.isFirstLogin());
+			dto = new MemberDTO(d.getId(), d.getEmail(), "", d.getName(), d.getRole(), d.isFirstLogin());
 		} else { // 카카오 로그인
 			DefaultOAuth2User d = (DefaultOAuth2User) authentication.getPrincipal();
 
@@ -56,7 +56,7 @@ public class JwtProvider {
 			Map<String, Object> kakao_account = (Map<String, Object>) d.getAttributes().get("kakao_account");
 			String email = kakao_account.get("email").toString();
 
-			dto = new MemberDTO(email, "", name, ROLE.ROLE_USER.name(), (Boolean) d.getAttributes().get("firstLogin"));
+			dto = new MemberDTO((Long) d.getAttributes().get("id"), email, "", name, ROLE.ROLE_USER.name(), (Boolean) d.getAttributes().get("firstLogin"));
 		}
 		claims = dto.getClaims();
 

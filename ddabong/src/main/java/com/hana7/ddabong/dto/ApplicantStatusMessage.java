@@ -1,4 +1,4 @@
 package com.hana7.ddabong.dto;
 
-public record ApplicantStatusMessage(Long activityPostId, String status) {
+public record ApplicantStatusMessage(Long activityPostId, Long userId, String status) {
 }

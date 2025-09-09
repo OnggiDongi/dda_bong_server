@@ -76,11 +76,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		try {
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 
+			long id = (int) claims.get("id");
 			String email = (String)claims.get("email");
 			String name = (String)claims.get("name");
 			String role = (String)claims.get("role");
 			boolean firstLogin = (Boolean)claims.get("firstLogin");
-			MemberDTO dto = new MemberDTO(email, "", name, role, firstLogin);
+			MemberDTO dto = new MemberDTO(id, email, "", name, role, firstLogin);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 					UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 

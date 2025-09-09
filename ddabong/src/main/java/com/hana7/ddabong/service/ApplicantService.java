@@ -38,7 +38,7 @@ public class ApplicantService {
 	private final UserReviewSummaryService userReviewSummaryService;
 
 	@Transactional
-	public Long rejectApplicant(String email, Long applicantId) {
+	public Map<String, Long> rejectApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -68,7 +68,14 @@ public class ApplicantService {
 				.build();
 		applicantRepository.save(applicant);
 
-		return applicant.getActivityPost().getId();
+		Long activityPostId = applicant.getActivityPost().getId();
+		Long userId = applicant.getUser().getId();
+
+		Map<String, Long> map = new HashMap<>();
+		map.put("activityPostId", activityPostId);
+		map.put("userId", userId);
+
+		return map;
 	}
 
 	public ApplicantDetailResponseDTO getApplicantInfo(Long userId){
@@ -184,7 +191,7 @@ public class ApplicantService {
 	}
 
 	@Transactional
-	public Long approveApplicant(String email, Long applicantId) {
+	public Map<String, Long> approveApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -213,7 +220,15 @@ public class ApplicantService {
 				.status(ApprovalStatus.APPROVED)
 				.build();
 		applicantRepository.save(applicant);
-		return applicant.getActivityPost().getId();
+
+		Long activityPostId = applicant.getActivityPost().getId();
+		Long userId = applicant.getUser().getId();
+
+		Map<String, Long> map = new HashMap<>();
+		map.put("activityPostId", activityPostId);
+		map.put("userId", userId);
+
+		return map;
 	}
 
 	private List<UserReviewResponseDTO> toReviewDto(List<UserReview> userReviews){

@@ -44,9 +44,11 @@ public class ApplicantController {
 	})
 	@PostMapping("/{applicantId}/reject")
 	public ResponseEntity<?> rejectApplicant(@PathVariable Long applicantId, Authentication authentication) {
-		Long activityPostId = applicantService.rejectApplicant(authentication.getName(), applicantId);
-		ApplicantStatusMessage msg = new ApplicantStatusMessage(activityPostId, "REJECTED");
-		messagingTemplate.convertAndSend("/topic/applicant-reject/" + activityPostId, msg);
+		Map<String, Long> map = applicantService.rejectApplicant(authentication.getName(), applicantId);
+		Long activityPostId = map.get("activityPostId");
+		Long userId = map.get("userId");
+		ApplicantStatusMessage msg = new ApplicantStatusMessage(activityPostId, userId,"REJECTED");
+		messagingTemplate.convertAndSend("/topic/applicant-status/" + activityPostId + "/" + userId, msg);
 		return ResponseEntity.ok().build();
 	}
 
@@ -62,9 +64,11 @@ public class ApplicantController {
 	})
 	@PostMapping("/{applicantId}/accept")
 	public ResponseEntity<?> approveApplicant(@PathVariable Long applicantId, Authentication authentication) {
-		Long activityPostId = applicantService.approveApplicant(authentication.getName(), applicantId);
-		ApplicantStatusMessage msg = new ApplicantStatusMessage(activityPostId, "APPROVED");
-		messagingTemplate.convertAndSend("/topic/applicant-accept/" + activityPostId, msg);
+		Map<String, Long> map = applicantService.approveApplicant(authentication.getName(), applicantId);
+		Long activityPostId = map.get("activityPostId");
+		Long userId = map.get("userId");
+		ApplicantStatusMessage msg = new ApplicantStatusMessage(activityPostId, userId, "APPROVED");
+		messagingTemplate.convertAndSend("/topic/applicant-status/" + activityPostId + "/" + userId, msg);
 		return ResponseEntity.ok().build();
 	}
 
