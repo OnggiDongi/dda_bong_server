@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,7 @@ public class ActivityPostController {
 	private final ActivityPostService activityPostService;
 	private final LikesService likesService;
 	private final ApplicantService applicantService;
+	private final SimpMessagingTemplate messagingTemplate;
 
 	@Tag(name = "봉사활동 게시물 API")
 	@Operation(summary = "게시물 등록")
@@ -124,8 +126,12 @@ public class ActivityPostController {
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
 	})
 	@PostMapping("/{activityPostId}/apply")
-	public ResponseEntity<?> applyActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
-		activityPostService.applyActivity(authentication.getName(), activityPostId);
+	public ResponseEntity<Void> applyActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
+		int applicantNum = activityPostService.applyActivity(authentication.getName(), activityPostId);
+
+		ApplicantCountMessage message = new ApplicantCountMessage(activityPostId, applicantNum);
+		messagingTemplate.convertAndSend("/topic/applicant-count/" + activityPostId, message);
+
 		return ResponseEntity.ok().build();
 	}
 
@@ -142,8 +148,10 @@ public class ActivityPostController {
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
 	})
 	@PostMapping("/{activityPostId}/reject")
-	public ResponseEntity<?> rejectActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
-		activityPostService.cancelActivity(authentication.getName(), activityPostId);
+	public ResponseEntity<Void> rejectActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
+		long userId = activityPostService.cancelActivity(authentication.getName(), activityPostId);
+		ApplicantRemovalMessage msg = new ApplicantRemovalMessage(activityPostId, userId);
+		messagingTemplate.convertAndSend("/topic/applicant-remove/" + activityPostId, msg);
 		return ResponseEntity.ok().build();
 	}
 

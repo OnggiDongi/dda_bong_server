@@ -23,10 +23,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +38,7 @@ public class ApplicantService {
 	private final UserReviewSummaryService userReviewSummaryService;
 
 	@Transactional
-	public void rejectApplicant(String email, Long applicantId) {
+	public Map<String, Long> rejectApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -70,6 +67,15 @@ public class ApplicantService {
 				.status(ApprovalStatus.REJECTED)
 				.build();
 		applicantRepository.save(applicant);
+
+		Long activityPostId = applicant.getActivityPost().getId();
+		Long userId = applicant.getUser().getId();
+
+		Map<String, Long> map = new HashMap<>();
+		map.put("activityPostId", activityPostId);
+		map.put("userId", userId);
+
+		return map;
 	}
 
 	public ApplicantDetailResponseDTO getApplicantInfo(Long userId){
@@ -185,7 +191,7 @@ public class ApplicantService {
 	}
 
 	@Transactional
-	public void approveApplicant(String email, Long applicantId) {
+	public Map<String, Long> approveApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -214,6 +220,15 @@ public class ApplicantService {
 				.status(ApprovalStatus.APPROVED)
 				.build();
 		applicantRepository.save(applicant);
+
+		Long activityPostId = applicant.getActivityPost().getId();
+		Long userId = applicant.getUser().getId();
+
+		Map<String, Long> map = new HashMap<>();
+		map.put("activityPostId", activityPostId);
+		map.put("userId", userId);
+
+		return map;
 	}
 
 	private List<UserReviewResponseDTO> toReviewDto(List<UserReview> userReviews){

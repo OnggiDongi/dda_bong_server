@@ -273,7 +273,7 @@ public class ActivityPostService {
 	}
 
 	@Transactional
-	public void applyActivity(String email, Long activityPostId) {
+	public int applyActivity(String email, Long activityPostId) {
 		ActivityPost post = activityPostRepository.findById(activityPostId)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
@@ -282,7 +282,7 @@ public class ActivityPostService {
 
 		Optional<Applicant> tmp = applicantRepository.findByUserAndActivityPost(user, post);
 
-		if (tmp.isPresent() && tmp.get().getDeletedAt() == null) { // 이미 해당 봉사활동에 신청한 유저라면
+		if (tmp.isPresent()) { // 이미 해당 봉사활동에 신청한 유저라면
 			throw new BadRequestException(ErrorCode.BAD_REQUEST_ALREADY_APPLIED);
 		}
 		if (post.getRecruitmentEnd().isBefore(LocalDateTime.now())) { // 마감일이 지난 봉사 모집글이라면
@@ -297,18 +297,21 @@ public class ActivityPostService {
 				.build();
 
 		applicantRepository.save(applicant);
+
+		long num = applicantRepository.countByActivityPost_IdAndDeletedAtIsNull(activityPostId);
+		return (int) num;
 	}
 
-	public void cancelActivity(String email, Long activityPostId) {
+	public long cancelActivity(String email, Long activityPostId) {
 		ActivityPost post = activityPostRepository.findById(activityPostId)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
-		Optional<Applicant> tmp = applicantRepository.findByUserAndActivityPost(user, post);
+		Optional<Applicant> tmp = applicantRepository.findByUserAndActivityPostAndDeletedAtIsNull(user, post);
 
-		if (tmp.isEmpty()) { // 이미 해당 봉사활동에 신청한 유저라면
+		if (tmp.isEmpty()) { // 봉사활동에 신청하지 않은 유저라면
 			throw new NotFoundException(ErrorCode.NOTFOUND_APPLICANT);
 		}
 
@@ -319,8 +322,9 @@ public class ActivityPostService {
 		}
 
 		// 삭제
-		applicant.markDeleted();
-		applicantRepository.save(applicant);
+		applicantRepository.delete(applicant);
+
+		return user.getId();
 	}
 
 	public List<MyActivityPostResponseDTO> getMyActivityPosts2(String email, boolean isRecruting) {
@@ -347,7 +351,7 @@ public class ActivityPostService {
 							.map(post -> {
 								// 지원자 총 인원 수
 								long applicants = post.getApplicants().stream()
-										.filter(applicant -> applicant.getStatus().equals(ApprovalStatus.PENDING))
+										.filter(applicant -> applicant.getStatus().equals(ApprovalStatus.PENDING) && applicant.getDeletedAt() == null)
 										.count();
 
 								return MyActivityPostResponseDTO.builder()

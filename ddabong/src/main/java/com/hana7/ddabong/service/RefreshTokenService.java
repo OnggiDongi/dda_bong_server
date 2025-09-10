@@ -48,9 +48,9 @@ public class RefreshTokenService {
 			if(institution == null || institution.getDeletedAt() != null){
 				throw new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION);
 			}
-			dto = new MemberDTO(institution.getEmail(), institution.getPassword(), institution.getName(), ROLE.ROLE_INSTITUTION.name(), false);
+			dto = new MemberDTO(institution.getId(),institution.getEmail(), institution.getPassword(), institution.getName(), ROLE.ROLE_INSTITUTION.name(), false);
 		} else {
-			dto = new MemberDTO(user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name(), false);
+			dto = new MemberDTO(user.getId(), user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name(), false);
 		}
 
 		Map<String, Object> claims1 = dto.getClaims();

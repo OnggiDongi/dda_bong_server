@@ -59,8 +59,9 @@ public class CustomOAuthService implements OAuth2UserService<OAuth2UserRequest, 
 					.birthdate(kakaoUserInfo.getBirthDate())
 					.profileImage(kakaoUserInfo.getProfileImage())
 					.build();
-			userRepository.save(newUser);
+			User save = userRepository.save(newUser);
 			attributes.put("firstLogin", true);
+			attributes.put("id", save.getId());
 			return new DefaultOAuth2User( List.of(new SimpleGrantedAuthority(ROLE.ROLE_USER.name())), attributes, userNameAttributeName);
 		}
 
@@ -69,6 +70,7 @@ public class CustomOAuthService implements OAuth2UserService<OAuth2UserRequest, 
 		} else {
 			attributes.put("firstLogin", true);
 		}
+		attributes.put("id", findUser.getId());
 
 		System.out.println("customOauthService - loadUser");
 		// Security context에 저장할 객체 생성
