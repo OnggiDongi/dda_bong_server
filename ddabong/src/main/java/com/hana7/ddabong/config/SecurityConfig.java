@@ -84,7 +84,7 @@ public class SecurityConfig {
 	private CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 //		config.setAllowedOrigins(List.of("http://localhost:3000")); // 정확한 origin 명시
-		config.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+		config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://ddabong.topician.com/"));
 		config.setAllowedMethods(List.of(
 				HttpMethod.GET.name(),
 				HttpMethod.POST.name(),
@@ -94,8 +94,11 @@ public class SecurityConfig {
 		config.setAllowedHeaders(List.of(
 				HttpHeaders.AUTHORIZATION,
 				HttpHeaders.CACHE_CONTROL,
-				HttpHeaders.CONTENT_TYPE));
+				HttpHeaders.CONTENT_TYPE,
+				"ngrok-skip-browser-warning"
+				));
 		config.setAllowCredentials(true);
+		config.setExposedHeaders(List.of("Authorization"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);

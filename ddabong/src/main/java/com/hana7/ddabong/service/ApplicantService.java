@@ -23,7 +23,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +35,10 @@ public class ApplicantService {
 	private final UserRepository userRepository;
 	private final UserReviewRepository userReviewRepository;
 	private final ActivityPostRepository activityPostRepository;
+	private final UserReviewSummaryService userReviewSummaryService;
 
 	@Transactional
-	public void rejectApplicant(String email, Long applicantId) {
+	public Map<String, Long> rejectApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -65,6 +67,15 @@ public class ApplicantService {
 				.status(ApprovalStatus.REJECTED)
 				.build();
 		applicantRepository.save(applicant);
+
+		Long activityPostId = applicant.getActivityPost().getId();
+		Long userId = applicant.getUser().getId();
+
+		Map<String, Long> map = new HashMap<>();
+		map.put("activityPostId", activityPostId);
+		map.put("userId", userId);
+
+		return map;
 	}
 
 	public ApplicantDetailResponseDTO getApplicantInfo(Long userId){
@@ -94,22 +105,20 @@ public class ApplicantService {
 				.mapToInt(UserReviewResponseDTO::getAttitude)
 				.average().orElse(0);
 
-		List<String> strCategories = user.getPreferredCategory().stream()
-				.map(Category::getDescription)
-				.toList();
-
+		// TODO : AIComment
+		String aiComment = userReviewSummaryService.summarizeForUser(user.getId());
 		return ApplicantDetailResponseDTO.builder()
 				.userName(user.getName())
 				.birthDate(formatDate(user.getBirthdate()))
 				.phoneNumber(user.getPhoneNumber())
 				.profileImage(user.getProfileImage())
-				.preferredCategory(strCategories)
-//							.reviewSummary("") // TODO : AI 붙이면 넣기
+				.preferredCategory(user.getPreferredCategory().getDescription())
 				.totalGrade(formatAverage(totalRate))
 				.healthStatus(formatAverage(totalHealthStatus))
 				.diligenceLevel(formatAverage(totalDiligenceLevel))
 				.attitude(formatAverage(totalAttitude))
-
+				.reviewSummary(aiComment)
+//				.reviewSummary("ai 연결 중지")
 				.userReviews(reviewDto)
 				.build();
 	}
@@ -121,27 +130,48 @@ public class ApplicantService {
 		ActivityPost activityPost = activityPostRepository.findById(activityPostId)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_ACTIVITY_POST));
 
+		if (!Objects.equals(institution.getId(), activityPost.getActivity().getInstitution().getId())){
+			throw new BadRequestException(ErrorCode.BAD_REQUEST_UNAUTHORIZED);
+		}
 
 		List<Applicant> applicants = applicantRepository.findByActivityPostIdAndDeletedAtIsNull(activityPostId);
+
+		// 1. 모든 지원자의 리뷰를 한번에 조회
+		List<Long> userIds = applicants.stream().map(a -> a.getUser().getId()).toList();
+		List<UserReview> allReviews = userReviewRepository.findByUserIdIn(userIds);
+
+		// 2. 사용자 ID별로 리뷰를 그룹화
+		Map<Long, List<UserReview>> reviewsByUserId = allReviews.stream()
+				.collect(Collectors.groupingBy(review -> review.getUser().getId()));
+
+		// 3. AI 요약 일괄 요청
+		// TODO : AIComment
+		Map<Long, String> summaries = userReviewSummaryService.summarizeForMultipleUsers(reviewsByUserId);
+
 		List<ApplicantReviewResponseDTO> list = applicants.stream().map(applicant -> {
 					User user = applicant.getUser();
-					List<UserReview> userReviews = userReviewRepository.findByUserId(user.getId());
+					List<UserReview> userReviews = reviewsByUserId.getOrDefault(user.getId(), Collections.emptyList());
 
-					double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
+			boolean hasReview = userReviewRepository.existsByUserIdAndActivityPost_Id(user.getId(), activityPostId);
+
+			double avgHealth = userReviews.stream().mapToDouble(UserReview::getHealthStatus).average().orElse(0.0);
 					double avgDiligence = userReviews.stream().mapToDouble(UserReview::getDiligenceLevel).average().orElse(0.0);
 					double avgAttitude = userReviews.stream().mapToDouble(UserReview::getAttitude).average().orElse(0.0);
 					double totalRate = (avgHealth + avgDiligence + avgAttitude) / 3.0;
 
 					return ApplicantReviewResponseDTO.builder()
 							.id(applicant.getId())
+							.userId(applicant.getUser().getId())
 							.name(user.getName())
 							.rate(formatAverage(totalRate))
-							.aiComment("") // TODO : AI 붙이면 넣기
+//							.aiComment("ai comment 연결 중지")
+							.aiComment(summaries.getOrDefault(user.getId(), "리뷰가 없습니다."))
 							.diligenceLevel(formatAverage(avgDiligence))
 							.healthStatus(formatAverage(avgHealth))
 							.attitude(formatAverage(avgAttitude))
-							.status(applicant.getStatus().getDescription())
+							.status(applicant.getStatus().toString())
 							.profileImage(user.getProfileImage())
+							.hasReview(hasReview)
 							.build();
 				}
 		).toList();
@@ -161,7 +191,7 @@ public class ApplicantService {
 	}
 
 	@Transactional
-	public void approveApplicant(String email, Long applicantId) {
+	public Map<String, Long> approveApplicant(String email, Long applicantId) {
 		Institution institution = institutionRepository.findByEmail(email)
 				.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_INSTITUTION));
 
@@ -190,9 +220,19 @@ public class ApplicantService {
 				.status(ApprovalStatus.APPROVED)
 				.build();
 		applicantRepository.save(applicant);
+
+		Long activityPostId = applicant.getActivityPost().getId();
+		Long userId = applicant.getUser().getId();
+
+		Map<String, Long> map = new HashMap<>();
+		map.put("activityPostId", activityPostId);
+		map.put("userId", userId);
+
+		return map;
 	}
 
 	private List<UserReviewResponseDTO> toReviewDto(List<UserReview> userReviews){
+		System.out.println("userReviews = " + userReviews);
 		return userReviews.stream()
 				.map(review -> {
 

@@ -74,7 +74,7 @@ public class ActivityPost extends BaseEntity {
 	@Column(nullable = false, length = 128)
 	private String location;
 
-	@Column(name = "image_url", length = 128, nullable = false)
+	@Column(name = "image_url", length = 255, nullable = false)
 	private String imageUrl;
 
 	@ManyToOne(fetch = FetchType.LAZY)

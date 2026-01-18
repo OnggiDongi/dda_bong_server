@@ -11,9 +11,9 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@Builder
 public class ActivityPostRequestDTO {
 
     @NotBlank(message = "제목은 필수 값입니다.")
@@ -26,13 +26,13 @@ public class ActivityPostRequestDTO {
     @NotNull(message = "봉사활동ID은 필수 값입니다.")
     private Long activityId;
 
-    @NotBlank(message = "활동 시작일시는 필수 값입니다. (yyyy-MM-dd HH:mm)")
+    @NotBlank(message = "활동 시작일시는 필수 값입니다. (yyyy.MM.dd HH:mm)")
     private String startAt;
 
-    @NotBlank(message = "총 활동 시간은 필수 값입니다. (HH:mm)")
-    private String activityTime;
+    @NotNull(message = "총 활동 시간은 필수 값입니다. (HH)")
+    private int activityTime;
 
-    @NotBlank(message = "모집 종료일시는 필수 값입니다. (yyyy-MM-dd HH:mm)")
+    @NotBlank(message = "모집 종료일시는 필수 값입니다. (yyyy.MM.dd)")
     private String recruitmentEnd;
 
     @NotBlank(message = "활동 장소는 필수 값입니다.")
@@ -43,6 +43,8 @@ public class ActivityPostRequestDTO {
     private int capacity;
 
     private MultipartFile image;
+
+    private List<String> supports;
 
     public ActivityPost toEntity(
             String fileUrl,
@@ -56,6 +58,7 @@ public class ActivityPostRequestDTO {
                 .content(content)
                 .startAt(startAt)
                 .endAt(endAt)
+                .recruitmentStart(LocalDateTime.now())
                 .recruitmentEnd(recruitmentEnd)
                 .capacity(capacity)
                 .location(location)

@@ -20,19 +20,27 @@ public class S3Service {
     private String bucketName;
 
     public String uploadFile(MultipartFile file) throws IOException {
-        String key = "uploads/" + file.getOriginalFilename();
+        String originalName = file.getOriginalFilename();
+        String uuid = java.util.UUID.randomUUID().toString();
 
-        Path tempFile = Files.createTempFile("upload-", file.getOriginalFilename());
+        // UUID를 추가
+        String key = "uploads/" + uuid + "-" + originalName;
+        Path tempFile = Files.createTempFile("upload-", uuid + "-" + originalName);
+
         file.transferTo(tempFile.toFile());
+
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
                 .contentType(file.getContentType())
                 .build();
+
         s3Client.putObject(putObjectRequest, tempFile);
         Files.delete(tempFile);
-        return "https://" + bucketName + ".s3." + s3Client.serviceClientConfiguration().region().id()
-                + ".amazonaws.com/" + key;
+
+        return "https://" + bucketName + ".s3." +
+                s3Client.serviceClientConfiguration().region().id() +
+                ".amazonaws.com/" + key;
     }
 }
 

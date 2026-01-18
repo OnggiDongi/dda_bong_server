@@ -10,5 +10,9 @@ import java.util.Optional;
 public interface UserReviewRepository extends JpaRepository<UserReview, Long> {
     List<UserReview> findByUserId(Long userId);
 
-    Optional<UserReview> findByUserIdAndActivityPost(Long userId, ActivityPost activityPost);
+    List<UserReview> findByUserIdIn(List<Long> userIds);
+
+	Optional<UserReview> findByUserIdAndActivityPost_Id(Long userId, Long activityPostId);
+
+	boolean existsByUserIdAndActivityPost_Id(Long userId, Long activityPostId);
 }

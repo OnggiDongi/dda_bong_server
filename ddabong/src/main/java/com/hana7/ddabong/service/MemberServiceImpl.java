@@ -34,11 +34,14 @@ public class MemberServiceImpl  implements UserDetailsService {
 			if(institution == null){
 				throw new UsernameNotFoundException(username);
 			} else if(institution.getDeletedAt() == null){
-				return new MemberDTO(institution.getEmail(), institution.getPassword(), institution.getName(), ROLE.ROLE_INSTITUTION.name());
+				return new MemberDTO(institution.getId(), institution.getEmail(), institution.getPassword(), institution.getName(), ROLE.ROLE_INSTITUTION.name(), false);
 			}
 		} else {
 			System.out.println("user = " + user);
-			return new MemberDTO(user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name());
+			if(user.getPreferredCategory() == null && user.getPreferredRegion() == null){
+				return new MemberDTO(user.getId(), user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name(), true);
+			}
+			return new MemberDTO(user.getId(), user.getEmail(), user.getPassword(), user.getName(),ROLE.ROLE_USER.name(), false);
 		}
 		return null;
 	}

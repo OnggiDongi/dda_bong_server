@@ -2,6 +2,7 @@ package com.hana7.ddabong.entity;
 
 import com.hana7.ddabong.enums.ApprovalStatus;
 
+import com.hana7.ddabong.enums.SupportRequestType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
@@ -29,11 +30,9 @@ public class SupportRequest extends BaseEntity{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "supply", length = 20, nullable = false)
-	private String supply;
-
-	@Column(name="detail", length = 256)
-	private String detail;
+	@Column(name = "supply", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private SupportRequestType supply;
 
 	@Column(name = "status", nullable = false)
 	@Enumerated(EnumType.STRING)

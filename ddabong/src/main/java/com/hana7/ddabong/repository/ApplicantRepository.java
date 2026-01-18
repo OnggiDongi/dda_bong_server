@@ -3,18 +3,23 @@ package com.hana7.ddabong.repository;
 import com.hana7.ddabong.entity.ActivityPost;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.entity.User;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
-    List<Applicant> findByUser(User user);
+    List<Applicant> findByUserAndDeletedAtIsNull(User user);
 
     boolean existsByUserAndActivityPostId(User user, Long activityPostId);
 
-    Optional<Applicant> findByUserAndActivityPost(User user, ActivityPost activityPost);
+    Optional<Applicant> findByUserAndActivityPostAndDeletedAtIsNull(User user, ActivityPost activityPost);
 
 
     List<Applicant> findByActivityPostIdAndDeletedAtIsNull(Long activityPostId);
+
+	long countByActivityPost_IdAndDeletedAtIsNull(Long activityPostId);
+
+	Optional<Applicant> findByUserAndActivityPost(User user, ActivityPost post);
 }

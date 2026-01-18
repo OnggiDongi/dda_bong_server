@@ -5,10 +5,11 @@ import com.hana7.ddabong.entity.Institution;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
-    Activity findActivityById(Long id);
+    Optional<Activity> findByIdAndDeletedAtIsNull(Long id);
 
 	List<Activity> findByInstitution(Institution institution);
 }

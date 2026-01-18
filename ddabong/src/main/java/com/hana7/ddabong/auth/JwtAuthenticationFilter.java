@@ -52,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/*.html",
 		"/auth/refresh",
 		"/upload/**",
+		"/broadcast/**"
 	};
 
 	@Override
@@ -66,21 +67,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 									@NonNull FilterChain filterChain) throws ServletException, IOException {
 		String uri = request.getRequestURI();
 
-		// ✅ refresh 요청은 accessToken 없이 통과시켜야 함
 		if (uri.equals("/auth/refresh")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-		System.out.println("authHeader: " + authHeader);
+//		System.out.println("authHeader: " + authHeader);
 		try {
-			System.out.println("** JwtAuthenticationFilter.doFilterInternal:" + authHeader.substring(7));
 			Map<String, Object> claims = JwtProvider.validateToken(authHeader.substring(7));
 
+			long id = (int) claims.get("id");
 			String email = (String)claims.get("email");
 			String name = (String)claims.get("name");
 			String role = (String)claims.get("role");
-			MemberDTO dto = new MemberDTO(email, "", name, role);
+			boolean firstLogin = (Boolean)claims.get("firstLogin");
+			MemberDTO dto = new MemberDTO(id, email, "", name, role, firstLogin);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 					UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
@@ -88,7 +89,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
+
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
 			ObjectMapper objectMapper = new ObjectMapper();
 			PrintWriter out = response.getWriter();
 			out.println(objectMapper.writeValueAsString(Map.of("error", "ERROR_ACCESS_TOKEN")));

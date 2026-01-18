@@ -4,14 +4,15 @@ import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
+import com.hana7.ddabong.dto.UserSummaryResponseDTO;
 import com.hana7.ddabong.dto.UserUpdateRequestDTO;
-import com.hana7.ddabong.entity.Applicant;
-import com.hana7.ddabong.entity.Likes;
-import com.hana7.ddabong.entity.User;
+import com.hana7.ddabong.entity.*;
+import com.hana7.ddabong.enums.Category;
 import com.hana7.ddabong.enums.ErrorCode;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
 import com.hana7.ddabong.exception.NotFoundException;
+import com.hana7.ddabong.repository.ActivityReviewRepository;
 import com.hana7.ddabong.repository.ApplicantRepository;
 import com.hana7.ddabong.repository.LikesRepository;
 import com.hana7.ddabong.repository.UserRepository;
@@ -21,9 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,46 +39,86 @@ public class UserService {
     private final UserRepository userRepository;
     private final ApplicantRepository applicantRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final S3Service s3Service;
+	private final ActivityReviewRepository activityReviewRepository;
 
 
-    public UserResponseDTO findUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
-        return toDTO(user);
+    public UserResponseDTO findUserByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+		String grade = user.getTotalHour() < 111 ? "SILVER" : "VIP";
+
+		return UserResponseDTO.builder()
+			.id(user.getId())
+			.name(user.getName())
+			.email(user.getEmail())
+			.phoneNumber(user.getPhoneNumber())
+			.totalHour(user.getTotalHour())
+			.birthdate(String.format("%04d.%02d.%02d",
+				user.getBirthdate().getYear(),
+				user.getBirthdate().getMonthValue(),
+				user.getBirthdate().getDayOfMonth()))
+			.preferredRegion(user.getPreferredRegion()!= null
+				? user.getPreferredRegion()
+				: null
+					)
+			.profileImage(user.getProfileImage()!= null
+				? user.getProfileImage()
+				: "https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/7edb4d83-5813-4032-8292-e9f73c086474-(Frame 2087326976.png)"
+					)
+			.preferredCategory(user.getPreferredCategory()!= null
+				? user.getPreferredCategory().getDescription()
+				: null
+					)
+			.grade(grade)
+			.build();
     }
 
     @Transactional
-    public UserResponseDTO updateOnboardingInfo(String email, UserOnboardingRequestDTO userOnboardingRequestDTO) {
+    public void updateOnboardingInfo(String email, UserOnboardingRequestDTO userOnboardingRequestDTO) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         user = user.toBuilder()
                 .preferredRegion(userOnboardingRequestDTO.getPreferredRegion())
-                .preferredCategory(userOnboardingRequestDTO.getPreferredCategory())
+                .preferredCategory(Category.fromDescription(userOnboardingRequestDTO.getPreferredCategory()))
                 .build();
 
         userRepository.save(user);
-
-        return toDTO(user);
     }
 
-    @Transactional
-    public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+	@Transactional
+	public UserResponseDTO updateUser(String email, UserUpdateRequestDTO userUpdateRequestDTO) throws IOException {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
-		String encodedPassword = passwordEncoder.encode(userUpdateRequestDTO.getPassword());
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+		String fileUrl = (userUpdateRequestDTO.getProfileImage() != null && !userUpdateRequestDTO.getProfileImage().isEmpty())
+				? s3Service.uploadFile(userUpdateRequestDTO.getProfileImage())
+				: user.getProfileImage();
 
-        User updatedUser = user.toBuilder()
-            .name(userUpdateRequestDTO.getName())
-            .phoneNumber(userUpdateRequestDTO.getPhoneNumber())
-            .password(encodedPassword)
-            .build();
+		User updated = user.toBuilder()
+				.password(userUpdateRequestDTO.getPassword() != null
+						? passwordEncoder.encode(userUpdateRequestDTO.getPassword())
+						: user.getPassword())
+				.phoneNumber(userUpdateRequestDTO.getPhoneNumber() != null
+						? userUpdateRequestDTO.getPhoneNumber()
+						: user.getPhoneNumber())
+				.birthdate(userUpdateRequestDTO.getBirthDate() != null
+						? LocalDate.parse(userUpdateRequestDTO.getBirthDate(), fmt)
+						: user.getBirthdate())
+				.profileImage(fileUrl)
+				.preferredRegion(userUpdateRequestDTO.getPreferredRegion() != null
+						? userUpdateRequestDTO.getPreferredRegion()
+						: user.getPreferredRegion())
+				.preferredCategory(userUpdateRequestDTO.getPreferredCategory() != null
+						? Category.fromDescription(userUpdateRequestDTO.getPreferredCategory())
+						: user.getPreferredCategory())
+				.build();
 
-        userRepository.save(updatedUser);
-
-        return toDTO(updatedUser);
-    }
+		userRepository.save(updated);
+		return toDTO(updated);
+	}
 
     public List<ActivityPostResponseDTO> findLikedActivities(String email) {
         User user = userRepository.findByEmail(email)
@@ -90,9 +134,21 @@ public class UserService {
     public List<ActivityPostResponseDTO> findActivityHistory(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
-        List<Applicant> applicants = applicantRepository.findByUser(user);
+
+        List<Applicant> applicants = applicantRepository.findByUserAndDeletedAtIsNull(user);
+		List<ActivityReview> reviews = activityReviewRepository.findByUser_Id_AndDeletedAtIsNull(user.getId());
+
+		Set<Long> reviewedActivityIds = reviews.stream()
+				.map(rv -> rv.getActivity().getId())
+				.collect(Collectors.toSet());
+
         return applicants.stream()
-                .map(applicant -> ActivityPostResponseDTO.of(applicant.getActivityPost()))
+                .map(applicant -> {
+					ActivityPost post = applicant.getActivityPost();
+					Long activityId = post.getActivity().getId();
+					boolean hasReview = reviewedActivityIds.contains(activityId);
+					return ActivityPostResponseDTO.of(post, hasReview, applicant.getStatus(), user.getTotalHour());
+				})
                 .collect(Collectors.toList());
     }
 
@@ -106,16 +162,22 @@ public class UserService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .totalHour(user.getTotalHour())
-                .birthdate(user.getBirthdate())
-                .preferredRegion(user.getPreferredRegion())
+				.birthdate(String.format("%04d.%02d.%02d",
+				user.getBirthdate().getYear(),
+				user.getBirthdate().getMonthValue(),
+				user.getBirthdate().getDayOfMonth()))
+				.preferredRegion(user.getPreferredRegion())
                 .profileImage(user.getProfileImage())
-                .preferredCategory(user.getPreferredCategory().stream()
-                        .map(Enum::name)
-                        .collect(Collectors.toList()))
+				.preferredCategory(
+					user.getPreferredCategory() != null
+					? user.getPreferredCategory().getDescription()
+					: null)
 				.grade(grade)
                 .build();
     }
 
+
+    @Transactional
 	public void signup(UserRequestDTO userRequestDTO) {
 		// 같은 아이디 있는지 확인하기
 		User user = userRepository.findByEmail(userRequestDTO.getEmail())
@@ -138,6 +200,7 @@ public class UserService {
 					.name(userRequestDTO.getName())
 					.phoneNumber(userRequestDTO.getPhoneNumber())
 					.birthdate(birthDate)
+					.profileImage("https://ddabong-upload.s3.ap-northeast-2.amazonaws.com/uploads/7edb4d83-5813-4032-8292-e9f73c086474-(Frame 2087326976.png)")
 					.isKakao(false)
 					.build();
 
@@ -147,5 +210,19 @@ public class UserService {
 
 		// 이미 있는 회원일 경우
 		throw new ConflictException(ErrorCode.CONFLICT_USER);
+	}
+
+	@Transactional
+	public UserSummaryResponseDTO findUserSummaryByEmail(String email) {
+		User user = userRepository.findByEmail(email)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
+
+		String grade = user.getTotalHour() < 111 ? "SILVER" : "VIP";
+
+		return UserSummaryResponseDTO.builder()
+			.name(user.getName())
+			.grade(grade)
+			.totalHour(user.getTotalHour())
+			.build();
 	}
 }

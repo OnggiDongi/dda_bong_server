@@ -8,8 +8,10 @@ import com.hana7.ddabong.service.RefreshTokenService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
@@ -44,7 +46,7 @@ public class JwtProvider {
 		Map<String, Object> claims =  new HashMap<>();
 
 		if (authentication.getPrincipal() instanceof MemberDTO d) { // 일반 로그인
-			dto = new MemberDTO(d.getEmail(), "", d.getName(), d.getRole());
+			dto = new MemberDTO(d.getId(), d.getEmail(), "", d.getName(), d.getRole(), d.isFirstLogin());
 		} else { // 카카오 로그인
 			DefaultOAuth2User d = (DefaultOAuth2User) authentication.getPrincipal();
 
@@ -54,12 +56,12 @@ public class JwtProvider {
 			Map<String, Object> kakao_account = (Map<String, Object>) d.getAttributes().get("kakao_account");
 			String email = kakao_account.get("email").toString();
 
-			dto = new MemberDTO(email, "", name, ROLE.ROLE_USER.name());
+			dto = new MemberDTO((Long) d.getAttributes().get("id"), email, "", name, ROLE.ROLE_USER.name(), (Boolean) d.getAttributes().get("firstLogin"));
 		}
 		claims = dto.getClaims();
 
 
-		String accessToken  = generateToken(new HashMap<>(claims), 60);
+		String accessToken  = generateToken(new HashMap<>(claims), 10);
 		String refreshToken = generateToken(new HashMap<>(claims), 60 * 24);
 
 		Map<String, Object> body = new HashMap<>(claims);
@@ -103,4 +105,13 @@ public class JwtProvider {
 
 		return (String) claims.get("email");
 	}
+
+	public static String extractTokenFromRequest(HttpServletRequest request) {
+		String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
+		if (bearer != null && bearer.startsWith("Bearer ")) {
+			return bearer.substring(7);
+		}
+		return null;
+	}
+
 }

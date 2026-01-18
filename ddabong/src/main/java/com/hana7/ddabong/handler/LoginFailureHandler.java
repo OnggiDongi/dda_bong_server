@@ -21,6 +21,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		response.setContentType("application/json");
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		PrintWriter out = response.getWriter();
 		out.println(objectMapper.writeValueAsString(Map.of("error", "ERROR_LOGIN")));
 		out.close();

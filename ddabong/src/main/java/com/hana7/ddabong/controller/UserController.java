@@ -1,5 +1,6 @@
 package com.hana7.ddabong.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -8,10 +9,13 @@ import com.hana7.ddabong.dto.ActivityPostResponseDTO;
 import com.hana7.ddabong.dto.UserOnboardingRequestDTO;
 import com.hana7.ddabong.dto.UserRequestDTO;
 import com.hana7.ddabong.dto.UserResponseDTO;
+import com.hana7.ddabong.dto.UserSummaryResponseDTO;
 import com.hana7.ddabong.dto.UserUpdateRequestDTO;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
+import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.UserService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,8 +23,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,19 +43,39 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+	private final RedisTemplate<String, String> redisTemplate;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findUserById(id));
+	@Tag(name = "내 정보")
+	@Operation(summary = "유저의 이메일로 유저 정보(이름, 전화번호, 생년월일, 프로필 사진, 선호지역/카테고리 , 등급) 조회")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보를 성공적으로 조회했습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+		@ApiResponse(responseCode = "404",
+			description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+	@GetMapping
+	public ResponseEntity<UserResponseDTO> getUserByEmail(Authentication authentication) {
+		String email = authentication.getName();
+        return ResponseEntity.ok(userService.findUserByEmail(email));
     }
 
     @PostMapping("/onboarding")
-    public ResponseEntity<UserResponseDTO> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {
-        return ResponseEntity.ok(userService.updateOnboardingInfo(authentication.getName(), userOnboardingRequestDTO));
+    public ResponseEntity<?> updateUserOnboardingInfo(@RequestBody UserOnboardingRequestDTO userOnboardingRequestDTO, Authentication authentication) {
+		userService.updateOnboardingInfo(authentication.getName(), userOnboardingRequestDTO);
+		return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+	@Tag(name = "내 정보")
+	@Operation(summary = "유저는 자신의 이름, 전화번호, 생년월일, 프로필 사진, 선호지역/카테고리, 비밀번호를 수정할 수 있다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보 수정을 성공적으로 완료했습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
+	})
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResponseDTO> updateUser(Authentication authentication, UserUpdateRequestDTO userUpdateRequestDTO) throws IOException {
         String email = authentication.getName();
         return ResponseEntity.ok(userService.updateUser(email, userUpdateRequestDTO));
     }
@@ -83,6 +110,30 @@ public class UserController {
 	@GetMapping("/login/kakao")
 	public ResponseEntity<Map<String, Object>> loginKakao(Authentication authentication) {
 		Map<String, Object> response = JwtProvider.getClaims(authentication);
+		System.out.println("response = " + response);
 		return ResponseEntity.ok(response);
+	}
+
+	@Tag(name = "이메일로 유저 정보 요약 조회")
+	@Operation(summary = "유저의 이메일로 유저 정보(이름, 등급, 누적 봉사시간) 조회")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "유저 정보 요약을 성공적으로 조회했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserSummaryResponseDTO.class))),
+		@ApiResponse(responseCode = "404",
+			description = "해당하는 유저가 존재하지 않습니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
+		@ApiResponse(responseCode = "400",
+			description = "잘못된 요청입니다.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
+	})
+	@GetMapping("/summary")
+	public ResponseEntity<UserSummaryResponseDTO> getUserSummaryByEmail(Authentication authentication) {
+		String email = authentication.getName();
+		return ResponseEntity.ok(userService.findUserSummaryByEmail(email));
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(Authentication authentication) {
+		redisTemplate.delete(authentication.getName());
+		return ResponseEntity.ok().build();
 	}
 }

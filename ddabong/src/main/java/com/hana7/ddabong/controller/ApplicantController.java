@@ -2,6 +2,8 @@ package com.hana7.ddabong.controller;
 
 import com.hana7.ddabong.dto.ApplicantDetailResponseDTO;
 import com.hana7.ddabong.dto.ApplicantListDTO;
+import com.hana7.ddabong.dto.ApplicantRemovalMessage;
+import com.hana7.ddabong.dto.ApplicantStatusMessage;
 import com.hana7.ddabong.entity.Applicant;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.ConflictException;
@@ -15,17 +17,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/apply")
+@Tag(name = "봉사 지원자")
 public class ApplicantController {
 	private final ApplicantService applicantService;
+	private final SimpMessagingTemplate messagingTemplate;
 
-	@Tag(name = "봉사 지원자 거절하기")
 	@Operation(summary = "기관은 자신이 등록한 봉사 모집글에 봉사 신청한 지원자를 거절할 수 있다.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "해당 지원자를 거절했습니다.", content = @Content(mediaType = "application/json")),
@@ -38,11 +44,14 @@ public class ApplicantController {
 	})
 	@PostMapping("/{applicantId}/reject")
 	public ResponseEntity<?> rejectApplicant(@PathVariable Long applicantId, Authentication authentication) {
-		applicantService.rejectApplicant(authentication.getName(), applicantId);
+		Map<String, Long> map = applicantService.rejectApplicant(authentication.getName(), applicantId);
+		Long activityPostId = map.get("activityPostId");
+		Long userId = map.get("userId");
+		ApplicantStatusMessage msg = new ApplicantStatusMessage(activityPostId, userId,"REJECTED");
+		messagingTemplate.convertAndSend("/topic/applicant-status/" + activityPostId + "/" + userId, msg);
 		return ResponseEntity.ok().build();
 	}
 
-	@Tag(name = "봉사 지원자 승인하기")
 	@Operation(summary = "기관은 자신이 등록한 봉사 모집글에 봉사 신청한 지원자를 승인할 수 있다.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "해당 지원자를 승인했습니다.", content = @Content(mediaType = "application/json")),
@@ -55,11 +64,22 @@ public class ApplicantController {
 	})
 	@PostMapping("/{applicantId}/accept")
 	public ResponseEntity<?> approveApplicant(@PathVariable Long applicantId, Authentication authentication) {
-		applicantService.approveApplicant(authentication.getName(), applicantId);
+		Map<String, Long> map = applicantService.approveApplicant(authentication.getName(), applicantId);
+		Long activityPostId = map.get("activityPostId");
+		Long userId = map.get("userId");
+		ApplicantStatusMessage msg = new ApplicantStatusMessage(activityPostId, userId, "APPROVED");
+		messagingTemplate.convertAndSend("/topic/applicant-status/" + activityPostId + "/" + userId, msg);
 		return ResponseEntity.ok().build();
 	}
 
 //	@PreAuthorize("hasAnyRole('ROLE_INSTITUTION')")
+	@Operation(summary = "기관은 자신의 봉사 모집글에 지원한 지원자 상세정보를 조회할 수 있다.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "해당 지원자의 정보를 조회했습니다.", content = @Content(mediaType = "application/json", schema =  @Schema(implementation = ApplicantDetailResponseDTO.class))),
+			@ApiResponse(responseCode = "404",
+					description = "해당하는 기관 | 지원자가 존재하지 않습니다.",
+					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
+	})
 	@GetMapping("/{userId}")
 	public ResponseEntity<?> getApplicantInfo(@PathVariable Long userId) {
 		ApplicantDetailResponseDTO applicantInfo = applicantService.getApplicantInfo(userId);

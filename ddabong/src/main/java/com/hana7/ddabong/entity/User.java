@@ -66,11 +66,9 @@ public class User extends BaseEntity{
 	@Column(name = "profile_image", length = 255)
 	private String profileImage;
 
-	@ElementCollection(targetClass = Category.class)
 	@Enumerated(EnumType.STRING)
 	@Column(name = "preferred_category")
-	@Builder.Default
-	private List<Category> preferredCategory = new ArrayList<>();
+	private Category preferredCategory;
 
 	@OneToMany(
 		mappedBy = "user",

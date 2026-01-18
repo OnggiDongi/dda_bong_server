@@ -9,6 +9,12 @@ import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.repository.CertificationRepository;
 import com.hana7.ddabong.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,22 +23,25 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CertificationService {
 
     private final CertificationRepository certificationRepository;
     private final UserRepository userRepository;
+    private final JobLauncher jobLauncher;
+    private final Job certificationJob;
 
+    @Transactional(readOnly = true)
     public List<CertificationResponseDTO> getCertifications(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
 
         List<Certification> certifications = certificationRepository.findAllByUser(user);
         return certifications.stream()
-                .map(CertificationResponseDTO::from)
+                .map((certification)-> CertificationResponseDTO.from(certification, user.getName()))
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public CertificationResponseDTO getCertification(Long certificationId, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTFOUND_USER));
@@ -44,6 +53,19 @@ public class CertificationService {
             throw new BadRequestException(ErrorCode.BAD_REQUEST_CERTIFICATION_ACCESS_DENIED);
         }
 
-        return CertificationResponseDTO.from(certification);
+        return CertificationResponseDTO.from(certification, user.getName());
+    }
+
+    @Scheduled(cron = "0 */5 * * * *")
+    public void checkAndIssueCertifications() throws Exception {
+        runCertificationJob();
+    }
+
+    public BatchStatus runCertificationJob() throws Exception {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLong("time", System.currentTimeMillis())
+                .toJobParameters();
+
+        return jobLauncher.run(certificationJob, jobParameters).getStatus();
     }
 }

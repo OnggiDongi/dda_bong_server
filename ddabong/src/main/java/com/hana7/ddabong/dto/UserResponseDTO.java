@@ -20,10 +20,10 @@ public class UserResponseDTO {
     private String email;
     private String phoneNumber;
     private int totalHour;
-    private LocalDate birthdate;
+    private String birthdate;
     private String preferredRegion;
     private String profileImage;
-    private List<String> preferredCategory;
+    private String preferredCategory;
     private String grade;
     
 }

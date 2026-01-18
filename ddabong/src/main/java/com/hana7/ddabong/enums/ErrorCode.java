@@ -13,6 +13,7 @@ public enum ErrorCode {
 	NOTFOUND_ACTIVITY(107, "해당 아이디를 가진 봉사 활동을 찾을 수 없습니다."),
 	NOTFOUND_APPLICANT(108, "해당 회원은 해당 봉사를 신청하지 않았습니다."),
 	NOTFOUND_REFRESHTOKEN(109, "RefreshToken이 없습니다. 로그인을 먼저 해주세요."),
+	NOTFOUND_CATEGORY(110, "해당하는 카테고리가 없습니다."),
 
 	BAD_REQUEST_FUTURE_BIRTHDATE(201, "생년월일이 현재보다 미래일 수 없습니다."),
 	BAD_REQUEST_INSTITUTION_MISMATCH(202, "리뷰를 작성하려는 활동의 주최 기관이 아닙니다."),

@@ -1,9 +1,6 @@
 package com.hana7.ddabong.controller;
 
-import com.hana7.ddabong.dto.ActivityPostDetailResponseDTO;
-import com.hana7.ddabong.dto.ActivityPostRequestDTO;
-import com.hana7.ddabong.dto.ActivityPostResponseDTO;
-import com.hana7.ddabong.dto.ApplicantListDTO;
+import com.hana7.ddabong.dto.*;
 import com.hana7.ddabong.exception.BadRequestException;
 import com.hana7.ddabong.exception.NotFoundException;
 import com.hana7.ddabong.service.ActivityPostService;
@@ -21,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +32,7 @@ public class ActivityPostController {
 	private final ActivityPostService activityPostService;
 	private final LikesService likesService;
 	private final ApplicantService applicantService;
+	private final SimpMessagingTemplate messagingTemplate;
 
 	@Tag(name = "봉사활동 게시물 API")
 	@Operation(summary = "게시물 등록")
@@ -52,7 +51,7 @@ public class ActivityPostController {
 	@GetMapping(value = "")
 	public ResponseEntity<List<ActivityPostResponseDTO>> readActivityPostList(
 			@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "1000") int pageSize,
 			@RequestParam(required = false) String searchRegion,
 			@RequestParam(required = false) String categories,
 			Authentication authentication
@@ -97,7 +96,7 @@ public class ActivityPostController {
 	@Tag(name = "봉사 모집글 상세보기")
 	@Operation(summary = "기관이 작성한 봉사 모집글에 대한 상세정보를 확인할 수 있다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ActivityPostDetailResponseDTO.class))),
 			@ApiResponse(responseCode = "404",
 					description = "해당하는 봉사 모집글이 존재하지 않습니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)))
@@ -127,8 +126,12 @@ public class ActivityPostController {
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
 	})
 	@PostMapping("/{activityPostId}/apply")
-	public ResponseEntity<?> applyActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
-		activityPostService.applyActivity(authentication.getName(), activityPostId);
+	public ResponseEntity<Void> applyActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
+		int applicantNum = activityPostService.applyActivity(authentication.getName(), activityPostId);
+
+		ApplicantCountMessage message = new ApplicantCountMessage(activityPostId, applicantNum);
+		messagingTemplate.convertAndSend("/topic/applicant-count/" + activityPostId, message);
+
 		return ResponseEntity.ok().build();
 	}
 
@@ -145,22 +148,24 @@ public class ActivityPostController {
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
 	})
 	@PostMapping("/{activityPostId}/reject")
-	public ResponseEntity<?> rejectActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
-		activityPostService.cancelActivity(authentication.getName(), activityPostId);
+	public ResponseEntity<Void> rejectActivityPost(@PathVariable Long activityPostId, Authentication authentication) {
+		long userId = activityPostService.cancelActivity(authentication.getName(), activityPostId);
+		ApplicantRemovalMessage msg = new ApplicantRemovalMessage(activityPostId, userId);
+		messagingTemplate.convertAndSend("/topic/applicant-remove/" + activityPostId, msg);
 		return ResponseEntity.ok().build();
 	}
 
 	@Tag(name = "자신이 작성한 봉사 모집글 조회하기")
 	@Operation(summary = "기관은 자신이 작성한 봉사 모집글을 조회할 수 있다.")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "200", description = "봉사 모집글 조회에 성공했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MyActivityPostResponseDTO.class))),
 			@ApiResponse(responseCode = "404",
 					description = "해당하는 기관이 존재하지 않습니다.",
 					content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
 	})
 	@GetMapping("/myposts")
-	public ResponseEntity<List<ActivityPostResponseDTO>> getActivityPost(Authentication authentication) {
-		List<ActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts(authentication.getName());
+	public ResponseEntity<List<MyActivityPostResponseDTO>> getActivityPost(@RequestParam(required = false, defaultValue = "true") boolean isRecruting, Authentication authentication) {
+		List<MyActivityPostResponseDTO> getMyActivityPosts = activityPostService.getMyActivityPosts2(authentication.getName(), isRecruting);
 		return ResponseEntity.ok(getMyActivityPosts);
 	}
 
@@ -181,7 +186,7 @@ public class ActivityPostController {
 	@Tag(name = "봉사 지원자 목록 확인하기")
 	@Operation(summary = "기관은 자신이 등록한 봉사 모집글에 봉사 신청한 지원자 목록을 확인할 수 있다.")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "해당 봉사 모집글에 지원한 지원자 목록입니다.", content = @Content(mediaType = "application/json")),
+		@ApiResponse(responseCode = "200", description = "해당 봉사 모집글에 지원한 지원자 목록입니다.", content = @Content(mediaType = "application/json", schema =  @Schema(implementation = ApplicantListDTO.class))),
 		@ApiResponse(responseCode = "404",
 			description = "해당하는 기관 | 봉사 모집글이 존재하지 않습니다.",
 			content = @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))),
